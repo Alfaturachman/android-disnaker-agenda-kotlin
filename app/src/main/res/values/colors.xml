@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_200">#b1e2f0</color>
+    <color name="purple_500">#2391b7</color>
+    <color name="purple_700">#205f7e</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <color name="grey_50">#f9f9f9</color>
+    <color name="grey_100">#efefef</color>
+    <color name="grey_200">#dcdcdc</color>
+    <color name="grey_300">#bdbdbd</color>
+    <color name="grey_400">#989898</color>
+    <color name="grey_500">#7c7c7c</color>
+    <color name="grey_600">#656565</color>
+    <color name="grey_700">#525252</color>
+    <color name="grey_800">#464646</color>
+    <color name="grey_900">#3d3d3d</color>
+    <color name="grey_950">#292929</color>
+
+    <!-- Badges color -->
+    <color name="badge_primary">#0d6efd</color>
+    <color name="badge_success">#19a061</color>
+    <color name="badge_danger">#dc3545</color>
+    <color name="badge_warning">#ffc107</color>
+    <color name="badge_info">#0dcaf0</color>
+    <color name="badge_dark">#35393c</color>
+    <color name="badge_secondary">#6c757d</color>
+</resources>
