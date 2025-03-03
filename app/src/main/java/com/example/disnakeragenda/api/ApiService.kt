@@ -10,5 +10,10 @@ import retrofit2.http.Headers
 import retrofit2.http.POST
 
 interface ApiService {
+    // POST
+    @POST("login.php")
+    fun loginUser(@Body body: RequestBody): Call<ResponseBody>
 
+    @POST("post_pelapor.php")
+    fun registerUser(@Body body: RequestBody): Call<ResponseBody>
 }

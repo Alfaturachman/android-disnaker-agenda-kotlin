@@ -1,4 +1,4 @@
-package com.example.disnakeragenda.ui.pelapor.detail
+package com.example.disnakeragenda.ui.mediator.agenda.riwayat
 
 import android.os.Bundle
 import android.view.View
@@ -7,11 +7,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.example.disnakeragenda.R
 
-class DetailPelaporActivity : AppCompatActivity() {
+class RiwayatAgendaActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_detail_pelapor)
+        setContentView(R.layout.activity_riwayat_agenda)
         supportActionBar!!.hide()
 
         window.statusBarColor = resources.getColor(R.color.white, theme)
