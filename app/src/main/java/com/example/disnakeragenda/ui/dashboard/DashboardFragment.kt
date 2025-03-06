@@ -35,7 +35,7 @@ class DashboardFragment : Fragment() {
         val root: View = binding.root
 
         // Level dari SharedPreferences
-        val level = "mediator"
+        val level = getLevelFromSharedPreferences()
         when (level) {
             "pelapor" -> {
                 binding.layoutPelapor.visibility = View.VISIBLE
