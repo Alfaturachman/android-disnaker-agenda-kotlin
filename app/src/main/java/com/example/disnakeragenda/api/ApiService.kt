@@ -1,6 +1,7 @@
 package com.example.disnakeragenda.api
 
 import com.example.disnakeragenda.model.RiwayatPelapor
+import com.example.disnakeragenda.model.TambahPelapor
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -24,4 +25,7 @@ interface ApiService {
     @Headers("Content-Type: application/json")
     @POST("get_detail_pelaporan.php")
     fun getDetailPelaporanPelapor(@Body request: Map<String, Int>): Call<ApiResponse<RiwayatPelapor>>
+
+    @POST("post_agenda_mediasi.php")
+    fun tambahPelapor(@Body request: TambahPelapor): Call<ApiResponse<TambahPelapor>>
 }
