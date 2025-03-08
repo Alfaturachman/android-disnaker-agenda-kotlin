@@ -50,7 +50,7 @@ class RiwayatPelaporAdapter(private var dataList: List<RiwayatPelapor>) :
         val statusColor = when (statusText) {
             "diproses" -> R.color.badge_warning
             "disetujui", "selesai" -> R.color.badge_success
-            "ditolak" -> R.color.badge_danger
+            "ditolak", "gagal" -> R.color.badge_danger
             else -> R.color.badge_secondary
         }
         holder.tvStatus.backgroundTintList = ContextCompat.getColorStateList(context, statusColor)

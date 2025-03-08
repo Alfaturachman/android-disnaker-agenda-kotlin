@@ -163,6 +163,7 @@ class TambahPelaporActivity : AppCompatActivity() {
 
                         val intent = Intent(this@TambahPelaporActivity, RiwayatPelaporActivity::class.java)
                         startActivity(intent)
+                        finish()
                     } else {
                         val errorBody = response.errorBody()?.string()
                         Log.e("TambahPelaporActivity", "Gagal menyimpan mediasi. Error: $errorBody")
