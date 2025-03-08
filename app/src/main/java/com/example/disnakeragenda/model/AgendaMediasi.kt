@@ -1,6 +1,6 @@
 package com.example.disnakeragenda.model
 
-data class RiwayatPelapor(
+data class AgendaMediasi(
     val id: Int,
     val id_laporan: Int,
     val tgl_mediasi: String,

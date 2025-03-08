@@ -1,7 +1,7 @@
-package com.example.disnakeragenda.ui.pelapor
+package com.example.disnakeragenda.ui.mediator.agenda
 
+import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -19,11 +19,11 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class RiwayatPelaporActivity : AppCompatActivity() {
+class RiwayatAgendaActivity : AppCompatActivity() {
 
     private var idPelapor: Int = -1
     private lateinit var recyclerView: RecyclerView
-    private lateinit var adapter: RiwayatPelaporAdapter
+    private lateinit var adapter: RiwayatAgendaAdapter
 
     // ActivityResultLauncher
     val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -32,10 +32,11 @@ class RiwayatPelaporActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_riwayat_pelapor)
+        setContentView(R.layout.activity_riwayat_agenda)
         supportActionBar!!.hide()
 
         window.statusBarColor = resources.getColor(R.color.white, theme)
@@ -47,30 +48,17 @@ class RiwayatPelaporActivity : AppCompatActivity() {
             finish()
         }
 
-        // ID dari SharedPreferences
-        idPelapor = getUserIdFromSharedPreferences()
-        Log.d("TAG", "onCreate: $idPelapor")
-
-        recyclerView = findViewById(R.id.recyclerViewRiwayatPelapor)
+        recyclerView = findViewById(R.id.recyclerViewRiwayatAgenda)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        adapter = RiwayatPelaporAdapter(emptyList())
+        adapter = RiwayatAgendaAdapter(emptyList())
         recyclerView.adapter = adapter
 
-        fetchRiwayatPelaporan(idPelapor)
+        fetchRiwayatPelaporan()
     }
 
-    private fun getUserIdFromSharedPreferences(): Int {
-        val sharedPreferences = this.getSharedPreferences("UserSession", Context.MODE_PRIVATE)
-        return sharedPreferences.getInt("id_user", -1)
-    }
-
-    private fun fetchRiwayatPelaporan(idPelapor: Int) {
-        val requestBody = hashMapOf("id_pelapor" to idPelapor)
-
-        Log.d("RiwayatPelapor", "Mengirim request ke server dengan body: $requestBody")
-
-        val call = RetrofitClient.instance.getRiwayatPelaporanPelapor(requestBody)
+    private fun fetchRiwayatPelaporan() {
+        val call = RetrofitClient.instance.getAgenda()
         call.enqueue(object : Callback<ApiResponse<List<AgendaMediasi>>> {
             override fun onResponse(
                 call: Call<ApiResponse<List<AgendaMediasi>>>,
@@ -99,7 +87,7 @@ class RiwayatPelaporActivity : AppCompatActivity() {
         })
     }
 
-    private fun refreshData() {
-        fetchRiwayatPelaporan(idPelapor)
+    public fun refreshData() {
+        fetchRiwayatPelaporan()
     }
 }

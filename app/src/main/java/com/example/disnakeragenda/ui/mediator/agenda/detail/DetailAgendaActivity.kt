@@ -1,4 +1,4 @@
-package com.example.disnakeragenda.ui.pelapor.detail
+package com.example.disnakeragenda.ui.mediator.agenda.detail
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -20,7 +20,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class DetailPelaporActivity : AppCompatActivity() {
+class DetailAgendaActivity : AppCompatActivity() {
 
     private var idMediasi: Int = -1
     private lateinit var tvNomorMediasi: TextView
@@ -43,7 +43,7 @@ class DetailPelaporActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_detail_pelapor)
+        setContentView(R.layout.activity_detail_agenda)
         supportActionBar?.hide()
 
         // Set status bar color dan mode light
@@ -123,7 +123,7 @@ class DetailPelaporActivity : AppCompatActivity() {
 
                                 val statusPelaporan = intent.getStringExtra("status")
                                 tvStatusPelaporan.text = statusPelaporan
-                                
+
                                 if (mediasi.id_laporan != null && mediasi.id_laporan != 0) {
                                     layoutLaporan.visibility = View.VISIBLE
 
@@ -137,7 +137,7 @@ class DetailPelaporActivity : AppCompatActivity() {
                         } else {
                             Log.e("API_ERROR", "Response gagal: ${mediasiResponse?.message}")
                             Toast.makeText(
-                                this@DetailPelaporActivity,
+                                this@DetailAgendaActivity,
                                 mediasiResponse?.message ?: "Data tidak ditemukan",
                                 Toast.LENGTH_SHORT
                             ).show()
@@ -145,13 +145,13 @@ class DetailPelaporActivity : AppCompatActivity() {
                     } else {
                         val errorBody = response.errorBody()?.string()
                         Log.e("API_ERROR", "Response Error: $errorBody")
-                        Toast.makeText(this@DetailPelaporActivity, "Gagal mengambil data", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@DetailAgendaActivity, "Gagal mengambil data", Toast.LENGTH_SHORT).show()
                     }
                 }
 
                 override fun onFailure(call: Call<ApiResponse<AgendaMediasi>>, t: Throwable) {
                     Log.e("API_ERROR", "Failure: ${t.message}", t)
-                    Toast.makeText(this@DetailPelaporActivity, "Terjadi kesalahan jaringan", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@DetailAgendaActivity, "Terjadi kesalahan jaringan", Toast.LENGTH_SHORT).show()
                 }
             })
     }

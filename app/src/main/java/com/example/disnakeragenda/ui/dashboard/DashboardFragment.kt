@@ -10,12 +10,11 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.disnakeragenda.databinding.FragmentDashboardBinding
-import com.example.disnakeragenda.ui.mediator.agenda.riwayat.RiwayatAgendaActivity
+import com.example.disnakeragenda.ui.mediator.agenda.RiwayatAgendaActivity
 import com.example.disnakeragenda.ui.mediator.agenda.tambah.TambahAgendaActivity
 import com.example.disnakeragenda.ui.mediator.laporan.riwayat.RiwayatLaporanActivity
 import com.example.disnakeragenda.ui.mediator.laporan.tambah.TambahLaporanActivity
 import com.example.disnakeragenda.ui.pelapor.RiwayatPelaporActivity
-import com.example.disnakeragenda.ui.pelapor.detail.DetailPelaporActivity
 import com.example.disnakeragenda.ui.pelapor.tambah.TambahPelaporActivity
 
 class DashboardFragment : Fragment() {

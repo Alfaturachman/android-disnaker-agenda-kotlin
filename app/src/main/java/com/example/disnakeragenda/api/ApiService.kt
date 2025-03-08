@@ -1,13 +1,14 @@
 package com.example.disnakeragenda.api
 
 import com.example.disnakeragenda.model.TotalRekapData
-import com.example.disnakeragenda.model.RiwayatPelapor
+import com.example.disnakeragenda.model.AgendaMediasi
 import com.example.disnakeragenda.model.StatsTotalData
 import com.example.disnakeragenda.model.TambahPelapor
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.POST
 
@@ -29,12 +30,12 @@ interface ApiService {
     fun StatsDataPelapor(@Body requestBody: HashMap<String, Int>): Call<ApiResponse<List<StatsTotalData>>>
 
     @Headers("Content-Type: application/json")
-    @POST("get_pelaporan_pelapor.php")
-    fun getRiwayatPelaporanPelapor(@Body request: Map<String, Int>): Call<ApiResponse<List<RiwayatPelapor>>>
+    @POST("get_agenda_pelapor.php")
+    fun getRiwayatPelaporanPelapor(@Body request: Map<String, Int>): Call<ApiResponse<List<AgendaMediasi>>>
 
     @Headers("Content-Type: application/json")
     @POST("get_detail_pelaporan.php")
-    fun getDetailPelaporanPelapor(@Body request: Map<String, Int>): Call<ApiResponse<RiwayatPelapor>>
+    fun getDetailPelaporanPelapor(@Body request: Map<String, Int>): Call<ApiResponse<AgendaMediasi>>
 
     @POST("post_agenda_mediasi.php")
     fun tambahPelapor(@Body request: TambahPelapor): Call<ApiResponse<TambahPelapor>>
@@ -47,4 +48,7 @@ interface ApiService {
     @Headers("Content-Type: application/json")
     @POST("get_stats_mediator.php")
     fun StatsDataMediator(@Body requestBody: HashMap<String, Int>): Call<ApiResponse<List<StatsTotalData>>>
+
+    @GET("get_all_agenda.php")
+    fun getAgenda(): Call<ApiResponse<List<AgendaMediasi>>>
 }
