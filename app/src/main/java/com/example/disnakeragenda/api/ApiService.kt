@@ -1,7 +1,8 @@
 package com.example.disnakeragenda.api
 
-import com.example.disnakeragenda.model.PelaporTotalData
+import com.example.disnakeragenda.model.TotalRekapData
 import com.example.disnakeragenda.model.RiwayatPelapor
+import com.example.disnakeragenda.model.StatsTotalData
 import com.example.disnakeragenda.model.TambahPelapor
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
@@ -21,7 +22,11 @@ interface ApiService {
     // Pelapor
     @Headers("Content-Type: application/json")
     @POST("get_pelapor_total_data.php")
-    fun TotalStokPelapor(@Body requestBody: HashMap<String, Int>): Call<ApiResponse<PelaporTotalData>>
+    fun TotalDataPelapor(@Body requestBody: HashMap<String, Int>): Call<ApiResponse<TotalRekapData>>
+
+    @Headers("Content-Type: application/json")
+    @POST("get_stats_pelapor.php")
+    fun StatsDataPelapor(@Body requestBody: HashMap<String, Int>): Call<ApiResponse<List<StatsTotalData>>>
 
     @Headers("Content-Type: application/json")
     @POST("get_pelaporan_pelapor.php")
@@ -33,4 +38,13 @@ interface ApiService {
 
     @POST("post_agenda_mediasi.php")
     fun tambahPelapor(@Body request: TambahPelapor): Call<ApiResponse<TambahPelapor>>
+
+    // Mediator
+    @Headers("Content-Type: application/json")
+    @POST("get_mediator_total_data.php")
+    fun TotalDataMediator(@Body requestBody: HashMap<String, Int>): Call<ApiResponse<TotalRekapData>>
+
+    @Headers("Content-Type: application/json")
+    @POST("get_stats_mediator.php")
+    fun StatsDataMediator(@Body requestBody: HashMap<String, Int>): Call<ApiResponse<List<StatsTotalData>>>
 }
