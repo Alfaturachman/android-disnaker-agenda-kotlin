@@ -62,6 +62,7 @@ class RiwayatAgendaAdapter(
             val intent = Intent(context, DetailAgendaActivity::class.java).apply {
                 putExtra("id_mediasi", item.id)
                 putExtra("id_laporan", item.id_laporan)
+                putExtra("id_mediator", item.id_mediator)
                 putExtra("nomor_mediasi", item.nomor_mediasi)
                 putExtra("nama_pihak_satu", item.nama_pihak_satu)
                 putExtra("nama_pihak_dua", item.nama_pihak_dua)

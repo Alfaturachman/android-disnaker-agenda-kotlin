@@ -3,6 +3,8 @@ package com.example.disnakeragenda.model
 data class AgendaMediasi (
     val id: Int,
     val id_laporan: Int,
+    val id_mediator: Int?,
+    val id_pelapor: Int,
     val tgl_mediasi: String,
     val waktu_mediasi: String,
     val nama_pihak_satu: String,

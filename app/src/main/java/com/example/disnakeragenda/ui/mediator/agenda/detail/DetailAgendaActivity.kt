@@ -31,7 +31,8 @@ import retrofit2.Response
 
 class DetailAgendaActivity : AppCompatActivity() {
 
-    private var idMediasi: Int = -1
+    private var idAgenda: Int = -1
+    private var idMediator: Int = -1
     private lateinit var tvNomorMediasi: TextView
     private lateinit var tvNamaPihak1: TextView
     private lateinit var tvNamaPihak2: TextView
@@ -94,7 +95,8 @@ class DetailAgendaActivity : AppCompatActivity() {
 
         // Ambil data dari intent
         val intent = intent
-        idMediasi = intent.getIntExtra("id_mediasi", 0)
+        idAgenda = intent.getIntExtra("id_mediasi", 0)
+        idMediator = intent.getIntExtra("id_mediator", 0)
         val nomorMediasi = intent.getStringExtra("nomor_mediasi")
         val namaPihak1 = intent.getStringExtra("nama_pihak_satu")
         val namaPihak2 = intent.getStringExtra("nama_pihak_dua")
@@ -116,11 +118,11 @@ class DetailAgendaActivity : AppCompatActivity() {
         tvNamaFilePdf.text = namaFilePdf
 
         fetchMediatorSpinner()
-        fetchDetailMediasi(idMediasi)
+        fetchDetailMediasi(idAgenda)
     }
 
-    private fun fetchDetailMediasi(idMediasi: Int) {
-        val requestBody = hashMapOf("id_mediasi" to idMediasi)
+    private fun fetchDetailMediasi(idAgenda: Int) {
+        val requestBody = hashMapOf("id_mediasi" to idAgenda)
 
         RetrofitClient.instance.getDetailPelaporanPelapor(requestBody)
             .enqueue(object : Callback<ApiResponse<AgendaMediasi>> {
@@ -210,7 +212,14 @@ class DetailAgendaActivity : AppCompatActivity() {
     }
 
     private fun setupSpinner() {
-        mediatorAdapter = MediatorSpinnerAdapter(this, mediatorList)
+        // Tambahkan opsi default di awal list
+        val defaultMediator = Mediator(
+            id_mediator = -1, nama = "- Pilih Mediator -",
+            id_user = 0, telp = "", nip = "", bidang = "", alamat = ""
+        )
+        val updatedMediatorList = mutableListOf(defaultMediator) + mediatorList
+
+        mediatorAdapter = MediatorSpinnerAdapter(this, updatedMediatorList)
     }
 
     @SuppressLint("MissingInflatedId")
@@ -221,31 +230,40 @@ class DetailAgendaActivity : AppCompatActivity() {
         // Set adapter untuk spinner
         spinnerEditAgenda.adapter = mediatorAdapter
 
+        // Tentukan posisi default berdasarkan idMediator
+        val defaultPosition = mediatorList.indexOfFirst { it.id_mediator == idMediator }
+        spinnerEditAgenda.setSelection(if (defaultPosition != -1) defaultPosition + 1 else 0)
+
         // Buat AlertDialog
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Edit Agenda")
             .setView(dialogView)
             .setPositiveButton("OK") { dialog, _ ->
-                val selectedMediatorId = mediatorAdapter.getMediatorId(spinnerEditAgenda.selectedItemPosition)
-                val selectedMediatorName = mediatorList[spinnerEditAgenda.selectedItemPosition].nama
-                handleEditAgenda(selectedMediatorId, selectedMediatorName, idMediasi)
+                val selectedPosition = spinnerEditAgenda.selectedItemPosition
+
+                // Pastikan pengguna memilih mediator yang valid
+                if (selectedPosition == 0) {
+                    Toast.makeText(this, "Silakan pilih mediator!", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+
+                val selectedMediator = mediatorAdapter.getItem(selectedPosition) as Mediator
+                handleEditAgenda(selectedMediator.id_mediator, selectedMediator.nama, idAgenda)
                 dialog.dismiss()
             }
             .setNegativeButton("Batal") { dialog, _ ->
                 dialog.dismiss()
             }
 
-        // Tampilkan Dialog
         val dialog = builder.create()
         dialog.show()
     }
 
-    private fun handleEditAgenda(mediatorId: Int, mediatorName: String, idMediasi: Int) {
+    private fun handleEditAgenda(mediatorId: Int, mediatorName: String, idAgenda: Int) {
         Log.d("DetailAgendaActivity", "Mediator dipilih: $mediatorName (ID: $mediatorId)")
 
-        // Data request untuk dikirim ke API
         val request = UpdateMediator(
-            id = idMediasi,
+            id = idAgenda,
             id_mediator = mediatorId
         )
 
