@@ -2,6 +2,7 @@ package com.example.disnakeragenda.api
 
 import com.example.disnakeragenda.model.TotalRekapData
 import com.example.disnakeragenda.model.AgendaMediasi
+import com.example.disnakeragenda.model.Mediator
 import com.example.disnakeragenda.model.StatsTotalData
 import com.example.disnakeragenda.model.TambahPelapor
 import okhttp3.RequestBody
@@ -51,4 +52,7 @@ interface ApiService {
 
     @GET("get_all_agenda.php")
     fun getAgenda(): Call<ApiResponse<List<AgendaMediasi>>>
+
+    @GET("get_all_mediator.php")
+    fun getMediator(): Call<ApiResponse<List<Mediator>>>
 }

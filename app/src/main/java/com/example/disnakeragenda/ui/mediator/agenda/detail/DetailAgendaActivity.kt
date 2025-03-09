@@ -7,15 +7,19 @@ import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
 import com.example.disnakeragenda.R
 import com.example.disnakeragenda.api.ApiResponse
 import com.example.disnakeragenda.api.RetrofitClient
 import com.example.disnakeragenda.helpers.DateHelper
 import com.example.disnakeragenda.model.AgendaMediasi
+import com.example.disnakeragenda.model.Mediator
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -35,9 +39,12 @@ class DetailAgendaActivity : AppCompatActivity() {
     private lateinit var tvNamaFilePdf: TextView
     private lateinit var tvTanggalPenutupan: TextView
     private lateinit var tvHasilMediasi: TextView
+    private lateinit var cardViewEditAgenda: CardView
     private lateinit var layoutLaporan: LinearLayout
     private lateinit var layoutFilePdf: LinearLayout
     private lateinit var ivPdfIcon: ImageView
+    private lateinit var mediatorAdapter: MediatorSpinnerAdapter
+    private val mediatorList = mutableListOf<Mediator>()
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,6 +70,7 @@ class DetailAgendaActivity : AppCompatActivity() {
         tvNamaFilePdf = findViewById(R.id.tvNamaFilePdf)
         tvTanggalPenutupan = findViewById(R.id.tvTanggalPenutupan)
         tvHasilMediasi = findViewById(R.id.tvHasilMediasi)
+        cardViewEditAgenda = findViewById(R.id.cardViewEditAgenda)
         layoutLaporan = findViewById(R.id.layoutLaporan)
         layoutFilePdf = findViewById(R.id.layoutFilePdf)
         ivPdfIcon = findViewById(R.id.ivPdfIcon)
@@ -71,6 +79,10 @@ class DetailAgendaActivity : AppCompatActivity() {
         val btnKembali: ImageButton = findViewById(R.id.btnKembali)
         btnKembali.setOnClickListener {
             finish()
+        }
+
+        cardViewEditAgenda.setOnClickListener {
+            showEditAgendaDialog()
         }
 
         layoutFilePdf.visibility = View.GONE
@@ -98,6 +110,7 @@ class DetailAgendaActivity : AppCompatActivity() {
         tvDeskripsiKasus.text = deskripsiKasus
         tvNamaFilePdf.text = namaFilePdf
 
+        fetchMediatorSpinner()
         fetchDetailMediasi(idMediasi)
     }
 
@@ -154,5 +167,77 @@ class DetailAgendaActivity : AppCompatActivity() {
                     Toast.makeText(this@DetailAgendaActivity, "Terjadi kesalahan jaringan", Toast.LENGTH_SHORT).show()
                 }
             })
+    }
+
+    private fun fetchMediatorSpinner() {
+        RetrofitClient.instance.getMediator().enqueue(object : Callback<ApiResponse<List<Mediator>>> {
+            override fun onResponse(
+                call: Call<ApiResponse<List<Mediator>>>,
+                response: Response<ApiResponse<List<Mediator>>>
+            ) {
+                if (response.isSuccessful) {
+                    response.body()?.let { apiResponse ->
+                        if (apiResponse.status) {
+                            // Pastikan apiResponse.data adalah List<Mediator>
+                            mediatorList.apply {
+                                clear()
+                                addAll(apiResponse.data ?: emptyList())
+                            }
+                            setupSpinner()
+                        } else {
+                            showToast("Gagal mengambil data mediator: Response tidak valid")
+                        }
+                    } ?: showToast("Response body null")
+                } else {
+                    showToast("Gagal mengambil data mediator: ${response.message()}")
+                }
+            }
+
+            override fun onFailure(call: Call<ApiResponse<List<Mediator>>>, t: Throwable) {
+                showToast("Error: ${t.localizedMessage}")
+                Log.e("fetchMediatorData", "Request failed", t)
+            }
+        })
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(this@DetailAgendaActivity, message, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun setupSpinner() {
+        mediatorAdapter = MediatorSpinnerAdapter(this, mediatorList)
+    }
+
+    @SuppressLint("MissingInflatedId")
+    private fun showEditAgendaDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_edit_agenda, null)
+        val spinnerEditAgenda = dialogView.findViewById<Spinner>(R.id.spinnerEditAgenda)
+
+        // Set adapter untuk spinner
+        spinnerEditAgenda.adapter = mediatorAdapter
+
+        // Buat AlertDialog
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Edit Agenda")
+            .setView(dialogView)
+            .setPositiveButton("OK") { dialog, _ ->
+                val selectedMediatorId = mediatorAdapter.getMediatorId(spinnerEditAgenda.selectedItemPosition)
+                val selectedMediatorName = mediatorList[spinnerEditAgenda.selectedItemPosition].nama
+                handleEditAgenda(selectedMediatorId, selectedMediatorName)
+                dialog.dismiss()
+            }
+            .setNegativeButton("Batal") { dialog, _ ->
+                dialog.dismiss()
+            }
+
+        // Tampilkan Dialog
+        val dialog = builder.create()
+        dialog.show()
+    }
+
+    private fun handleEditAgenda(mediatorId: Int, mediatorName: String) {
+        // Lakukan aksi berdasarkan mediatorId dan mediatorName
+        Log.d("DetailAgendaActivity", "Mediator dipilih: $mediatorName (ID: $mediatorId)")
+        Toast.makeText(this, "Berhasil simpan edit agenda", Toast.LENGTH_SHORT).show()
     }
 }
