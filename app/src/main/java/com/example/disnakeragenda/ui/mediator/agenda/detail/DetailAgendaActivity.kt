@@ -1,6 +1,7 @@
 package com.example.disnakeragenda.ui.mediator.agenda.detail
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -20,6 +21,10 @@ import com.example.disnakeragenda.api.RetrofitClient
 import com.example.disnakeragenda.helpers.DateHelper
 import com.example.disnakeragenda.model.AgendaMediasi
 import com.example.disnakeragenda.model.Mediator
+import com.example.disnakeragenda.model.TambahPelapor
+import com.example.disnakeragenda.model.UpdateMediator
+import com.example.disnakeragenda.ui.pelapor.RiwayatPelaporActivity
+import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -223,7 +228,7 @@ class DetailAgendaActivity : AppCompatActivity() {
             .setPositiveButton("OK") { dialog, _ ->
                 val selectedMediatorId = mediatorAdapter.getMediatorId(spinnerEditAgenda.selectedItemPosition)
                 val selectedMediatorName = mediatorList[spinnerEditAgenda.selectedItemPosition].nama
-                handleEditAgenda(selectedMediatorId, selectedMediatorName)
+                handleEditAgenda(selectedMediatorId, selectedMediatorName, idMediasi)
                 dialog.dismiss()
             }
             .setNegativeButton("Batal") { dialog, _ ->
@@ -235,9 +240,45 @@ class DetailAgendaActivity : AppCompatActivity() {
         dialog.show()
     }
 
-    private fun handleEditAgenda(mediatorId: Int, mediatorName: String) {
-        // Lakukan aksi berdasarkan mediatorId dan mediatorName
+    private fun handleEditAgenda(mediatorId: Int, mediatorName: String, idMediasi: Int) {
         Log.d("DetailAgendaActivity", "Mediator dipilih: $mediatorName (ID: $mediatorId)")
-        Toast.makeText(this, "Berhasil simpan edit agenda", Toast.LENGTH_SHORT).show()
+
+        // Data request untuk dikirim ke API
+        val request = UpdateMediator(
+            id = idMediasi,
+            id_mediator = mediatorId
+        )
+
+        Log.d("DetailAgendaActivity", "Request yang dikirim: $request")
+
+        // Panggil API untuk update id_mediator
+        RetrofitClient.instance.updateMediator(request).enqueue(object : Callback<ApiResponse<Unit>> {
+            override fun onResponse(call: Call<ApiResponse<Unit>>, response: Response<ApiResponse<Unit>>) {
+                if (response.isSuccessful) {
+                    val result = response.body()
+
+                    Log.d("DetailAgendaActivity", "Response berhasil diterima: $result")
+
+                    if (result != null && result.status) {
+                        Log.d("DetailAgendaActivity", "Mediator berhasil diupdate!")
+
+                        Toast.makeText(this@DetailAgendaActivity, "Mediator berhasil diupdate!", Toast.LENGTH_SHORT).show()
+                        finish()
+                    } else {
+                        val errorBody = response.errorBody()?.string()
+                        Log.e("DetailAgendaActivity", "Mediator sudah dipilih sebelumnya. Error: $errorBody")
+                        Toast.makeText(this@DetailAgendaActivity, "Gagal mengupdate mediator!", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    Log.e("DetailAgendaActivity", "Response error: ${response.code()} - ${response.message()}")
+                    Toast.makeText(this@DetailAgendaActivity, "Error: ${response.message()}", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<ApiResponse<Unit>>, t: Throwable) {
+                Log.e("DetailAgendaActivity", "Gagal menghubungi server: ${t.message}", t)
+                Toast.makeText(this@DetailAgendaActivity, "Gagal menghubungi server!", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 }

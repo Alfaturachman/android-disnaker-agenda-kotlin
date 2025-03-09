@@ -5,6 +5,7 @@ import com.example.disnakeragenda.model.AgendaMediasi
 import com.example.disnakeragenda.model.Mediator
 import com.example.disnakeragenda.model.StatsTotalData
 import com.example.disnakeragenda.model.TambahPelapor
+import com.example.disnakeragenda.model.UpdateMediator
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -55,4 +56,7 @@ interface ApiService {
 
     @GET("get_all_mediator.php")
     fun getMediator(): Call<ApiResponse<List<Mediator>>>
+
+    @POST("update_mediator.php")
+    fun updateMediator(@Body request: UpdateMediator): Call<ApiResponse<Unit>>
 }
