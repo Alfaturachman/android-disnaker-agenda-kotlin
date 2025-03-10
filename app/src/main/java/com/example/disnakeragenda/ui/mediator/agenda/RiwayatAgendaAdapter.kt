@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.activity.result.ActivityResultLauncher
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.disnakeragenda.R
@@ -14,6 +15,8 @@ import com.example.disnakeragenda.ui.mediator.agenda.detail.DetailAgendaActivity
 
 class RiwayatAgendaAdapter(
     private var agendaList: List<AgendaMediasi>,
+    private val startForResult: ActivityResultLauncher<Intent>,
+    private val onRefresh: () -> Unit
 ) : RecyclerView.Adapter<RiwayatAgendaAdapter.AgendaViewHolder>() {
 
     class AgendaViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -74,7 +77,7 @@ class RiwayatAgendaAdapter(
                 putExtra("tempat_mediasi", item.jenis_kasus)
                 putExtra("file_pdf", item.file_pdf)
             }
-            context.startActivity(intent)
+            startForResult.launch(intent)
         }
     }
 

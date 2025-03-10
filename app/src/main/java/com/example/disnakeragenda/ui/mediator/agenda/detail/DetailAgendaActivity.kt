@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.ArrayAdapter
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -33,6 +34,7 @@ class DetailAgendaActivity : AppCompatActivity() {
 
     private var idAgenda: Int = -1
     private var idMediator: Int = -1
+    private var statusPelaporan: String = "Tidak ada"
     private lateinit var tvNomorMediasi: TextView
     private lateinit var tvNamaPihak1: TextView
     private lateinit var tvNamaPihak2: TextView
@@ -107,6 +109,9 @@ class DetailAgendaActivity : AppCompatActivity() {
         val deskripsiKasus = intent.getStringExtra("deskripsi_kasus")
         val namaFilePdf = intent.getStringExtra("file_pdf")
 
+        statusPelaporan = intent.getStringExtra("status").toString()
+        tvStatusPelaporan.text = statusPelaporan
+
         tvNomorMediasi.text = "#$nomorMediasi"
         tvNamaPihak1.text = namaPihak1
         tvNamaPihak2.text = namaPihak2
@@ -140,9 +145,6 @@ class DetailAgendaActivity : AppCompatActivity() {
                                 Log.d("API_RESPONSE", "Data berhasil diterima: $mediasi")
 
                                 layoutLaporan.visibility = View.GONE
-
-                                val statusPelaporan = intent.getStringExtra("status")
-                                tvStatusPelaporan.text = statusPelaporan
 
                                 if (mediasi.id_laporan != null && mediasi.id_laporan != 0) {
                                     layoutLaporan.visibility = View.VISIBLE
@@ -226,13 +228,23 @@ class DetailAgendaActivity : AppCompatActivity() {
     private fun showEditAgendaDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_edit_agenda, null)
         val spinnerEditAgenda = dialogView.findViewById<Spinner>(R.id.spinnerEditAgenda)
+        val spinnerStatus = dialogView.findViewById<Spinner>(R.id.spinnerStatus)
 
-        // Set adapter untuk spinner
+        // Set adapter untuk mediator
         spinnerEditAgenda.adapter = mediatorAdapter
 
         // Tentukan posisi default berdasarkan idMediator
         val defaultPosition = mediatorList.indexOfFirst { it.id_mediator == idMediator }
         spinnerEditAgenda.setSelection(if (defaultPosition != -1) defaultPosition + 1 else 0)
+
+        // Tambahkan adapter untuk spinnerStatus
+        val statusList = listOf("diproses", "ditolak", "disetujui")
+        val statusAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, statusList)
+        spinnerStatus.adapter = statusAdapter
+
+        // Set status default jika ada
+        val defaultStatusPosition = statusList.indexOf(statusPelaporan)
+        spinnerStatus.setSelection(if (defaultStatusPosition != -1) defaultStatusPosition else 0)
 
         // Buat AlertDialog
         val builder = AlertDialog.Builder(this)
@@ -240,6 +252,7 @@ class DetailAgendaActivity : AppCompatActivity() {
             .setView(dialogView)
             .setPositiveButton("OK") { dialog, _ ->
                 val selectedPosition = spinnerEditAgenda.selectedItemPosition
+                val selectedStatus = spinnerStatus.selectedItem.toString()
 
                 // Pastikan pengguna memilih mediator yang valid
                 if (selectedPosition == 0) {
@@ -248,7 +261,7 @@ class DetailAgendaActivity : AppCompatActivity() {
                 }
 
                 val selectedMediator = mediatorAdapter.getItem(selectedPosition) as Mediator
-                handleEditAgenda(selectedMediator.id_mediator, selectedMediator.nama, idAgenda)
+                handleEditAgenda(selectedMediator.id_mediator, selectedMediator.nama, idAgenda, selectedStatus)
                 dialog.dismiss()
             }
             .setNegativeButton("Batal") { dialog, _ ->
@@ -259,12 +272,13 @@ class DetailAgendaActivity : AppCompatActivity() {
         dialog.show()
     }
 
-    private fun handleEditAgenda(mediatorId: Int, mediatorName: String, idAgenda: Int) {
-        Log.d("DetailAgendaActivity", "Mediator dipilih: $mediatorName (ID: $mediatorId)")
+    private fun handleEditAgenda(mediatorId: Int, mediatorName: String, idAgenda: Int, selectedStatus: String) {
+        Log.d("DetailAgendaActivity", "Mediator dipilih: $mediatorName (ID: $mediatorId) (Status: $selectedStatus)")
 
         val request = UpdateMediator(
             id = idAgenda,
-            id_mediator = mediatorId
+            id_mediator = mediatorId,
+            status = selectedStatus
         )
 
         Log.d("DetailAgendaActivity", "Request yang dikirim: $request")
@@ -281,6 +295,7 @@ class DetailAgendaActivity : AppCompatActivity() {
                         Log.d("DetailAgendaActivity", "Mediator berhasil diupdate!")
 
                         Toast.makeText(this@DetailAgendaActivity, "Mediator berhasil diupdate!", Toast.LENGTH_SHORT).show()
+                        setResult(RESULT_OK)
                         finish()
                     } else {
                         val errorBody = response.errorBody()?.string()

@@ -21,12 +21,12 @@ import retrofit2.Response
 
 class RiwayatAgendaActivity : AppCompatActivity() {
 
-    private var idPelapor: Int = -1
     private lateinit var recyclerView: RecyclerView
-    private lateinit var adapter: RiwayatAgendaAdapter
+    private lateinit var agendaAdapter: RiwayatAgendaAdapter
+    private var agendaList: List<AgendaMediasi> = listOf()
 
-    // ActivityResultLauncher
-    val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+    // ActivityResultLauncher untuk menangkap hasil dari aktivitas lain
+    private val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             refreshData()
         }
@@ -37,29 +37,29 @@ class RiwayatAgendaActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_riwayat_agenda)
-        supportActionBar!!.hide()
+        supportActionBar?.hide() // Hindari crash jika supportActionBar null
 
         window.statusBarColor = resources.getColor(R.color.white, theme)
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
 
-        // Button Kembali
+        // Tombol kembali
         val btnKembali: ImageButton = findViewById(R.id.btnKembali)
-        btnKembali.setOnClickListener {
-            finish()
-        }
+        btnKembali.setOnClickListener { finish() }
 
+        // Inisialisasi RecyclerView
         recyclerView = findViewById(R.id.recyclerViewRiwayatAgenda)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        adapter = RiwayatAgendaAdapter(emptyList())
-        recyclerView.adapter = adapter
+        // Inisialisasi adapter kosong
+        agendaAdapter = RiwayatAgendaAdapter(emptyList(), startForResult) { refreshData() }
+        recyclerView.adapter = agendaAdapter
 
+        // Ambil data dari API
         fetchRiwayatPelaporan()
     }
 
     private fun fetchRiwayatPelaporan() {
-        val call = RetrofitClient.instance.getAgenda()
-        call.enqueue(object : Callback<ApiResponse<List<AgendaMediasi>>> {
+        RetrofitClient.instance.getAgenda().enqueue(object : Callback<ApiResponse<List<AgendaMediasi>>> {
             override fun onResponse(
                 call: Call<ApiResponse<List<AgendaMediasi>>>,
                 response: Response<ApiResponse<List<AgendaMediasi>>>
@@ -70,9 +70,10 @@ class RiwayatAgendaActivity : AppCompatActivity() {
                     val responseBody = response.body()
                     if (responseBody?.status == true) {
                         Log.d("RiwayatPelapor", "Data berhasil diterima: ${responseBody.data}")
-                        responseBody.data?.let {
-                            adapter.updateData(it)
-                        }
+                        agendaList = responseBody.data ?: listOf()
+
+                        // Update adapter dengan data terbaru
+                        agendaAdapter.updateData(agendaList)
                     } else {
                         Log.e("RiwayatPelapor", "Gagal mendapatkan data: ${responseBody?.message}")
                     }
