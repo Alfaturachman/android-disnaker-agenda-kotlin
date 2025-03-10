@@ -12,7 +12,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.disnakeragenda.databinding.FragmentDashboardBinding
 import com.example.disnakeragenda.ui.mediator.agenda.RiwayatAgendaActivity
 import com.example.disnakeragenda.ui.mediator.agenda.tambah.TambahAgendaActivity
-import com.example.disnakeragenda.ui.mediator.laporan.riwayat.RiwayatLaporanActivity
+import com.example.disnakeragenda.ui.mediator.laporan.RiwayatLaporanActivity
 import com.example.disnakeragenda.ui.mediator.laporan.tambah.TambahLaporanActivity
 import com.example.disnakeragenda.ui.pelapor.RiwayatPelaporActivity
 import com.example.disnakeragenda.ui.pelapor.tambah.TambahPelaporActivity
@@ -53,11 +53,6 @@ class DashboardFragment : Fragment() {
             "mediator" -> {
                 binding.layoutPelapor.visibility = View.GONE
                 binding.layoutMediator.visibility = View.VISIBLE
-
-                binding.cardViewTambahAgenda.setOnClickListener {
-                        val intent = Intent(requireContext(), TambahAgendaActivity::class.java)
-                    startActivity(intent)
-                }
 
                 binding.cardViewRiwayatAgenda.setOnClickListener {
                     val intent = Intent(requireContext(), RiwayatAgendaActivity::class.java)

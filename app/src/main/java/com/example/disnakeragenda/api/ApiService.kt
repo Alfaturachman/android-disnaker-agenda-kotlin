@@ -1,5 +1,6 @@
 package com.example.disnakeragenda.api
 
+import com.example.disnakeragenda.model.AgendaLaporan
 import com.example.disnakeragenda.model.TotalRekapData
 import com.example.disnakeragenda.model.AgendaMediasi
 import com.example.disnakeragenda.model.Mediator
@@ -59,4 +60,8 @@ interface ApiService {
 
     @POST("update_mediator.php")
     fun updateMediator(@Body request: UpdateMediator): Call<ApiResponse<Unit>>
+
+    // Laporan
+    @GET("get_all_laporan.php")
+    fun getLaporan(): Call<ApiResponse<List<AgendaLaporan>>>
 }

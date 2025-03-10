@@ -1,4 +1,4 @@
-package com.example.disnakeragenda.ui.mediator.agenda
+package com.example.disnakeragenda.ui.mediator.laporan
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -14,16 +14,17 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.disnakeragenda.R
 import com.example.disnakeragenda.api.ApiResponse
 import com.example.disnakeragenda.api.RetrofitClient
-import com.example.disnakeragenda.model.AgendaMediasi
+import com.example.disnakeragenda.model.AgendaLaporan
+import com.example.disnakeragenda.ui.mediator.agenda.RiwayatAgendaAdapter
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class RiwayatAgendaActivity : AppCompatActivity() {
+class RiwayatLaporanActivity : AppCompatActivity() {
 
     private var idPelapor: Int = -1
     private lateinit var recyclerView: RecyclerView
-    private lateinit var adapter: RiwayatAgendaAdapter
+    private lateinit var adapter: RiwayatLaporanAdapter
 
     // ActivityResultLauncher
     val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -36,7 +37,7 @@ class RiwayatAgendaActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_riwayat_agenda)
+        setContentView(R.layout.activity_riwayat_laporan)
         supportActionBar!!.hide()
 
         window.statusBarColor = resources.getColor(R.color.white, theme)
@@ -48,21 +49,21 @@ class RiwayatAgendaActivity : AppCompatActivity() {
             finish()
         }
 
-        recyclerView = findViewById(R.id.recyclerViewRiwayatAgenda)
+        recyclerView = findViewById(R.id.recyclerViewRiwayatLaporan)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        adapter = RiwayatAgendaAdapter(emptyList())
+        adapter = RiwayatLaporanAdapter(emptyList())
         recyclerView.adapter = adapter
 
         fetchRiwayatPelaporan()
     }
 
     private fun fetchRiwayatPelaporan() {
-        val call = RetrofitClient.instance.getAgenda()
-        call.enqueue(object : Callback<ApiResponse<List<AgendaMediasi>>> {
+        val call = RetrofitClient.instance.getLaporan()
+        call.enqueue(object : Callback<ApiResponse<List<AgendaLaporan>>> {
             override fun onResponse(
-                call: Call<ApiResponse<List<AgendaMediasi>>>,
-                response: Response<ApiResponse<List<AgendaMediasi>>>
+                call: Call<ApiResponse<List<AgendaLaporan>>>,
+                response: Response<ApiResponse<List<AgendaLaporan>>>
             ) {
                 Log.d("RiwayatPelapor", "Response diterima dengan kode: ${response.code()}")
 
@@ -81,7 +82,7 @@ class RiwayatAgendaActivity : AppCompatActivity() {
                 }
             }
 
-            override fun onFailure(call: Call<ApiResponse<List<AgendaMediasi>>>, t: Throwable) {
+            override fun onFailure(call: Call<ApiResponse<List<AgendaLaporan>>>, t: Throwable) {
                 Log.e("RiwayatPelapor", "Gagal menghubungi server: ${t.localizedMessage}", t)
             }
         })

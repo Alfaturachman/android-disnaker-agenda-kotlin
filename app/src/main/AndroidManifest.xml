@@ -18,6 +18,9 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".ui.mediator.laporan.detail.DetailLaporanActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.mediator.agenda.edit.EditAgendaActivity"
             android:exported="false" />
         <activity
@@ -27,7 +30,7 @@
             android:name=".ui.success.SuccessActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.mediator.laporan.riwayat.RiwayatLaporanActivity"
+            android:name=".ui.mediator.laporan.RiwayatLaporanActivity"
             android:exported="false" />
         <activity
             android:name=".ui.mediator.laporan.tambah.TambahLaporanActivity"

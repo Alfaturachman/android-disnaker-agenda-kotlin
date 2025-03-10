@@ -1,5 +1,6 @@
 package com.example.disnakeragenda.ui.pelapor.tambah
 
+import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Context
@@ -40,6 +41,7 @@ class TambahPelaporActivity : AppCompatActivity() {
     private var selectedTime: String = ""
     private lateinit var buttonSimpan: Button
 
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -58,7 +60,7 @@ class TambahPelaporActivity : AppCompatActivity() {
         etTempatMediasi = findViewById(R.id.etTempatMediasi)
         etJenisKasus = findViewById(R.id.etJenisKasus)
         etDeskripsiKasus = findViewById(R.id.etDeskripsiKasus)
-        buttonSimpan = findViewById(R.id.buttonLogin)
+        buttonSimpan = findViewById(R.id.buttonSimpan)
 
         // Button Kembali
         val btnKembali: ImageButton = findViewById(R.id.btnKembali)
