@@ -1,6 +1,7 @@
 package com.example.disnakeragenda.ui.mediator.laporan
 
 import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +12,7 @@ import com.example.disnakeragenda.R
 import com.example.disnakeragenda.helpers.DateHelper
 import com.example.disnakeragenda.model.AgendaLaporan
 import com.example.disnakeragenda.ui.mediator.agenda.detail.DetailAgendaActivity
+import com.example.disnakeragenda.ui.mediator.laporan.detail.DetailLaporanActivity
 
 class RiwayatLaporanAdapter(
     private var agendaList: List<AgendaLaporan>,
@@ -57,7 +59,7 @@ class RiwayatLaporanAdapter(
 
         // Button CardView
         holder.cardView.setOnClickListener {
-            val intent = Intent(context, DetailAgendaActivity::class.java).apply {
+            val intent = Intent(context, DetailLaporanActivity::class.java).apply {
                 putExtra("id_mediasi", item.id)
                 putExtra("id_laporan", item.id_laporan)
                 putExtra("id_mediator", item.id_mediator)

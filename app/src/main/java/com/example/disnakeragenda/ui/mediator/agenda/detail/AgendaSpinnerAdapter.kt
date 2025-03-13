@@ -8,7 +8,7 @@ import android.widget.TextView
 import com.example.disnakeragenda.R
 import com.example.disnakeragenda.model.Mediator
 
-class MediatorSpinnerAdapter(
+class AgendaSpinnerAdapter(
     context: Context,
     private val mediatorList: List<Mediator>
 ) : ArrayAdapter<Mediator>(context, R.layout.item_spinner, mediatorList) {

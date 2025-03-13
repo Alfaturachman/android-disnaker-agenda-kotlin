@@ -2,6 +2,7 @@ package com.example.disnakeragenda.ui.mediator.laporan.tambah
 
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -14,53 +15,22 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.example.disnakeragenda.R
+import com.example.disnakeragenda.api.ApiResponse
+import com.example.disnakeragenda.api.RetrofitClient
 import com.example.disnakeragenda.model.AgendaLaporan
 import com.google.android.material.textfield.TextInputEditText
 import java.util.Calendar
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class TambahLaporanActivity : AppCompatActivity() {
 
+    private var idUserDetail: Int = -1
     private lateinit var spinnerAgendaMediasi: Spinner
     private lateinit var spinnerStatusLaporan: Spinner
     private lateinit var agendaAdapter: AgendaSpinnerAdapter
-    private val agendaList = listOf(
-        AgendaLaporan(
-            id = 1,
-            id_mediator = 1,
-            id_pelapor = 101,
-            nomor_mediasi = 12345,
-            nama_pihak_satu = "John Doe",
-            nama_pihak_dua = "Jane Smith",
-            nama_kasus = "Sengketa Lahan",
-            tgl_mediasi = "2025-03-10",
-            waktu_mediasi = "10:00",
-            status = "Terjadwal",
-            tempat = "Ruang Mediasi A",
-            jenis_kasus = "Perdata",
-            deskripsi_kasus = "Perselisihan kepemilikan tanah antara dua pihak.",
-            id_laporan = 201,
-            tgl_penutupan = null,
-            hasil_mediasi = null
-        ),
-        AgendaLaporan(
-            id = 2,
-            id_mediator = 2,
-            id_pelapor = 102,
-            nomor_mediasi = 12346,
-            nama_pihak_satu = "Michael Johnson",
-            nama_pihak_dua = "Emily Davis",
-            nama_kasus = "Sengketa Kontrak Kerja",
-            tgl_mediasi = "2025-03-12",
-            waktu_mediasi = "13:30",
-            status = "Menunggu",
-            tempat = "Ruang Mediasi B",
-            jenis_kasus = "Ketenagakerjaan",
-            deskripsi_kasus = "Perselisihan kontrak kerja antara karyawan dan perusahaan.",
-            id_laporan = 202,
-            tgl_penutupan = null,
-            hasil_mediasi = null
-        )
-    )
+    private var agendaList: List<AgendaLaporan> = emptyList()
     private lateinit var etNamaPihak1: TextInputEditText
     private lateinit var etNamaPihak2: TextInputEditText
     private lateinit var etTanggalMediasi: TextInputEditText
@@ -89,6 +59,8 @@ class TambahLaporanActivity : AppCompatActivity() {
             finish()
         }
 
+        idUserDetail = getuserIdDetailFromSharedPreferences()
+
         etNamaPihak1 = findViewById(R.id.etNamaPihak1)
         etNamaPihak2 = findViewById(R.id.etNamaPihak2)
         etTanggalMediasi = findViewById(R.id.etTanggalMediasi)
@@ -101,8 +73,8 @@ class TambahLaporanActivity : AppCompatActivity() {
 
         // Tanggal Penutupan
         etTanggalPenutupan = findViewById(R.id.etTanggalPenutupan)
-        etTanggalMediasi.isFocusable = false
-        etTanggalMediasi.isClickable = true
+        etTanggalPenutupan.isFocusable = false
+        etTanggalPenutupan.isClickable = true
         etTanggalPenutupan.setOnClickListener {
             val calendar = Calendar.getInstance()
             val year = calendar.get(Calendar.YEAR)
@@ -123,6 +95,7 @@ class TambahLaporanActivity : AppCompatActivity() {
 
         // Setup Spinner
         setupSpinner()
+        fetchAgendaMediasi(idUserDetail)
         setupStatusSpinner()
 
         // Button Simpan
@@ -161,6 +134,48 @@ class TambahLaporanActivity : AppCompatActivity() {
 
             Toast.makeText(this, "Data berhasil disimpan ke log", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun fetchAgendaMediasi(userId: Int) {
+        val requestBody = hashMapOf("id_mediator" to userId)
+
+        RetrofitClient.instance.getAgendaMediasi(requestBody).enqueue(object : Callback<ApiResponse<List<AgendaLaporan>>> {
+            override fun onResponse(
+                call: Call<ApiResponse<List<AgendaLaporan>>>,
+                response: Response<ApiResponse<List<AgendaLaporan>>>
+            ) {
+                if (response.isSuccessful && response.body()?.status == true) {
+                    agendaList = response.body()?.data ?: emptyList()
+                    val defaultAgenda = AgendaLaporan(
+                        id = -1,
+                        id_mediator = null,
+                        id_pelapor = null,
+                        nomor_mediasi = null,
+                        nama_pihak_satu = null,
+                        nama_pihak_dua = null,
+                        nama_kasus = "Pilih Agenda",
+                        tgl_mediasi = null,
+                        waktu_mediasi = null,
+                        status = null,
+                        tempat = null,
+                        jenis_kasus = null,
+                        deskripsi_kasus = null,
+                        id_laporan = null,
+                        tgl_penutupan = null,
+                        hasil_mediasi = null
+                    )
+
+                    agendaAdapter.clear()
+                    agendaAdapter.addAll(listOf(defaultAgenda) + agendaList)
+                } else {
+                    Toast.makeText(this@TambahLaporanActivity, "Gagal mengambil data", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<ApiResponse<List<AgendaLaporan>>>, t: Throwable) {
+                Toast.makeText(this@TambahLaporanActivity, "Gagal terhubung ke server", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 
     private fun setupSpinner() {
@@ -224,7 +239,7 @@ class TambahLaporanActivity : AppCompatActivity() {
     }
 
     private fun setupStatusSpinner() {
-        val statusList = listOf("Pilih Status Laporan", "Selesai", "Gagal", "Dilanjut ke Pengadilan")
+        val statusList = listOf("Pilih Status Laporan", "selesai", "gagal", "dilanjut ke Pengadilan")
 
         // Buat adapter untuk spinner status
         val statusAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, statusList)
@@ -251,5 +266,10 @@ class TambahLaporanActivity : AppCompatActivity() {
                 // Tidak ada yang dipilih
             }
         }
+    }
+
+    private fun getuserIdDetailFromSharedPreferences(): Int {
+        val sharedPreferences = this.getSharedPreferences("UserSession", Context.MODE_PRIVATE)
+        return sharedPreferences.getInt("id_user_detail", -1)
     }
 }

@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.disnakeragenda.R
 import com.example.disnakeragenda.model.AgendaMediasi
 import com.example.disnakeragenda.helpers.DateHelper
+import com.example.disnakeragenda.ui.mediator.laporan.detail.DetailLaporanActivity
 import com.example.disnakeragenda.ui.pelapor.detail.DetailPelaporActivity
 
 class RiwayatPelaporAdapter(
@@ -59,7 +60,7 @@ class RiwayatPelaporAdapter(
 
         // Button CardView
         holder.cardView.setOnClickListener {
-            val intent = Intent(context, DetailPelaporActivity::class.java).apply {
+            val intent = Intent(context, DetailLaporanActivity::class.java).apply {
                 putExtra("id_mediasi", item.id)
                 putExtra("id_laporan", item.id_laporan)
                 putExtra("nomor_mediasi", item.nomor_mediasi)

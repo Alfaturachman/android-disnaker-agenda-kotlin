@@ -64,4 +64,8 @@ interface ApiService {
     // Laporan
     @GET("get_all_laporan.php")
     fun getLaporan(): Call<ApiResponse<List<AgendaLaporan>>>
+
+    @Headers("Content-Type: application/json")
+    @POST("get_spinner_agenda.php")
+    fun getAgendaMediasi(@Body requestBody: HashMap<String, Int>): Call<ApiResponse<List<AgendaLaporan>>>
 }

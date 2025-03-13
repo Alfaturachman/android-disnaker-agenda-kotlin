@@ -16,25 +16,26 @@ class AgendaSpinnerAdapter(context: Context, private val agendaList: List<Agenda
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val view = super.getView(position, convertView, parent) as TextView
-        view.text = formatText(getItem(position))
+        val agenda = agendaList[position]
+        view.text = formatAgendaText(agenda) // Format teks sesuai kebutuhan
         return view
     }
 
     override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
         val view = super.getDropDownView(position, convertView, parent) as TextView
-        view.text = formatText(getItem(position))
+        val agenda = agendaList[position]
+        view.text = formatAgendaText(agenda) // Format teks sesuai kebutuhan
         return view
     }
 
-    private fun formatText(agenda: AgendaLaporan?): String {
-        return if (agenda == null ||
-            (agenda.nama_pihak_satu == null &&
-                    agenda.nama_pihak_dua == null &&
-                    agenda.nama_kasus == null)
-        ) {
-            "Pilih Agenda Mediasi"
+    // Fungsi untuk memformat teks agenda
+    private fun formatAgendaText(agenda: AgendaLaporan): String {
+        return if (agenda.id == -1) {
+            // Jika agenda default, tampilkan "Pilih Agenda"
+            "Pilih Agenda"
         } else {
-            "${agenda.nama_pihak_satu ?: "-"} & ${agenda.nama_pihak_dua ?: "-"} - ${agenda.nama_kasus ?: "-"}"
+            // Format: "nama_pihak_satu & nama_pihak_dua - nama_kasus"
+            "${agenda.nama_pihak_satu ?: ""} & ${agenda.nama_pihak_dua ?: ""} - ${agenda.nama_kasus ?: ""}"
         }
     }
 }

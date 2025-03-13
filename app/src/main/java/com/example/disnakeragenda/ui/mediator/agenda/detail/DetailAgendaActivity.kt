@@ -1,7 +1,6 @@
 package com.example.disnakeragenda.ui.mediator.agenda.detail
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -22,10 +21,7 @@ import com.example.disnakeragenda.api.RetrofitClient
 import com.example.disnakeragenda.helpers.DateHelper
 import com.example.disnakeragenda.model.AgendaMediasi
 import com.example.disnakeragenda.model.Mediator
-import com.example.disnakeragenda.model.TambahPelapor
 import com.example.disnakeragenda.model.UpdateMediator
-import com.example.disnakeragenda.ui.pelapor.RiwayatPelaporActivity
-import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -52,7 +48,7 @@ class DetailAgendaActivity : AppCompatActivity() {
     private lateinit var layoutLaporan: LinearLayout
     private lateinit var layoutFilePdf: LinearLayout
     private lateinit var ivPdfIcon: ImageView
-    private lateinit var mediatorAdapter: MediatorSpinnerAdapter
+    private lateinit var mediatorAdapter: AgendaSpinnerAdapter
     private val mediatorList = mutableListOf<Mediator>()
 
     @SuppressLint("MissingInflatedId")
@@ -224,7 +220,7 @@ class DetailAgendaActivity : AppCompatActivity() {
         )
         val updatedMediatorList = mutableListOf(defaultMediator) + mediatorList
 
-        mediatorAdapter = MediatorSpinnerAdapter(this, updatedMediatorList)
+        mediatorAdapter = AgendaSpinnerAdapter(this, updatedMediatorList)
     }
 
     @SuppressLint("MissingInflatedId")

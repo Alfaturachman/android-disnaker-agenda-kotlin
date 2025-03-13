@@ -38,6 +38,7 @@ class DashboardFragment : Fragment() {
         when (level) {
             "pelapor" -> {
                 binding.layoutPelapor.visibility = View.VISIBLE
+                binding.layoutAdmin.visibility = View.GONE
                 binding.layoutMediator.visibility = View.GONE
 
                 binding.cardViewRiwayatLaporan.setOnClickListener {
@@ -52,6 +53,7 @@ class DashboardFragment : Fragment() {
             }
             "mediator" -> {
                 binding.layoutPelapor.visibility = View.GONE
+                binding.layoutAdmin.visibility = View.VISIBLE
                 binding.layoutMediator.visibility = View.VISIBLE
 
                 binding.cardViewRiwayatAgenda.setOnClickListener {
@@ -69,8 +71,20 @@ class DashboardFragment : Fragment() {
                     startActivity(intent)
                 }
             }
-            else -> {
-                Toast.makeText(requireContext(), "Level pengguna tidak valid", Toast.LENGTH_SHORT).show()
+            "admin" -> {
+                binding.layoutPelapor.visibility = View.GONE
+                binding.layoutAdmin.visibility = View.VISIBLE
+                binding.layoutMediator.visibility = View.GONE
+
+                binding.cardViewRiwayatAgenda.setOnClickListener {
+                    val intent = Intent(requireContext(), RiwayatAgendaActivity::class.java)
+                    startActivity(intent)
+                }
+
+                binding.cardViewRiwayatLaporanMediator.setOnClickListener {
+                    val intent = Intent(requireContext(), RiwayatLaporanActivity::class.java)
+                    startActivity(intent)
+                }
             }
         }
 

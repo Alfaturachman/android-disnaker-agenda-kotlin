@@ -141,7 +141,6 @@ class TambahAgendaActivity : AppCompatActivity() {
             nama_pihak_dua = namaPihak2,
             tgl_mediasi = formattedDate,
             waktu_mediasi = formattedTime,
-            tempat = tempatMediasi,
             jenis_kasus = jenisKasus,
             deskripsi_kasus = deskripsiKasus
         )
