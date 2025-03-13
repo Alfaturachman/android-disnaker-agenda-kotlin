@@ -24,6 +24,8 @@ import java.util.Calendar
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class TambahLaporanActivity : AppCompatActivity() {
 
@@ -103,7 +105,7 @@ class TambahLaporanActivity : AppCompatActivity() {
         buttonSimpan.setOnClickListener {
             val selectedAgenda = spinnerAgendaMediasi.selectedItem as? AgendaLaporan
             val idAgendaMediasi = selectedAgenda?.id
-            val tanggalPenutupan = etTanggalPenutupan.text.toString().trim()
+            val tanggalPenutupanInput = etTanggalPenutupan.text.toString().trim()
             val statusLaporan = spinnerStatusLaporan.selectedItem.toString()
             val hasilMediasi = etHasilMediasi.text.toString().trim()
 
@@ -113,7 +115,7 @@ class TambahLaporanActivity : AppCompatActivity() {
                     Toast.makeText(this, "Silakan pilih agenda mediasi terlebih dahulu!", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
-                tanggalPenutupan.isEmpty() -> {
+                tanggalPenutupanInput.isEmpty() -> {
                     Toast.makeText(this, "Silakan isi tanggal penutupan!", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
@@ -127,6 +129,18 @@ class TambahLaporanActivity : AppCompatActivity() {
                 }
             }
 
+            // Konversi tanggal ke format YYYY-MM-DD jika belum sesuai
+            val tanggalPenutupan = try {
+                val inputFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()) // Sesuaikan dengan format input
+                val outputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                val date = inputFormat.parse(tanggalPenutupanInput)
+                outputFormat.format(date ?: "")
+            } catch (e: Exception) {
+                Log.e("TambahLaporanActivity", "Error parsing tanggal: ${e.message}")
+                Toast.makeText(this, "Format tanggal tidak valid!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             // Buat request body
             val laporanRequest = LaporanRequest(
                 idAgendaMediasi = idAgendaMediasi,
@@ -135,29 +149,43 @@ class TambahLaporanActivity : AppCompatActivity() {
                 hasilMediasi = hasilMediasi
             )
 
+            // Cetak log sebelum mengirim data ke server
+            Log.d("TambahLaporanActivity", "Mengirim Data: ")
+            Log.d("TambahLaporanActivity", "ID Agenda Mediasi: $idAgendaMediasi")
+            Log.d("TambahLaporanActivity", "Tanggal Penutupan: $tanggalPenutupan") // Format sudah YYYY-MM-DD
+            Log.d("TambahLaporanActivity", "Status Laporan: $statusLaporan")
+            Log.d("TambahLaporanActivity", "Hasil Mediasi: $hasilMediasi")
+
             // Kirim data ke server
             RetrofitClient.instance.simpanLaporan(laporanRequest).enqueue(object : Callback<ApiResponse<Unit>> {
                 override fun onResponse(call: Call<ApiResponse<Unit>>, response: Response<ApiResponse<Unit>>) {
-                    if (response.isSuccessful && response.body()?.status == true) {
-                        Toast.makeText(this@TambahLaporanActivity, "Laporan berhasil disimpan", Toast.LENGTH_SHORT).show()
-                        finish() // Tutup activity setelah berhasil menyimpan
+                    Log.d("TambahLaporanActivity", "Response dari server diterima")
+                    Log.d("TambahLaporanActivity", "HTTP Status Code: ${response.code()}")
+
+                    if (response.isSuccessful) {
+                        val responseBody = response.body()
+                        Log.d("TambahLaporanActivity", "Response Body: $responseBody")
+
+                        if (responseBody?.status == true) {
+                            Log.d("TambahLaporanActivity", "Laporan berhasil disimpan")
+                            Toast.makeText(this@TambahLaporanActivity, "Laporan berhasil disimpan", Toast.LENGTH_SHORT).show()
+                            finish() // Tutup activity setelah berhasil menyimpan
+                        } else {
+                            Log.e("TambahLaporanActivity", "Gagal menyimpan laporan - Server mengembalikan false")
+                            Toast.makeText(this@TambahLaporanActivity, "Gagal menyimpan laporan", Toast.LENGTH_SHORT).show()
+                        }
                     } else {
+                        Log.e("TambahLaporanActivity", "Gagal menyimpan laporan - Response tidak sukses")
+                        Log.e("TambahLaporanActivity", "Response Error Body: ${response.errorBody()?.string()}")
                         Toast.makeText(this@TambahLaporanActivity, "Gagal menyimpan laporan", Toast.LENGTH_SHORT).show()
                     }
                 }
 
                 override fun onFailure(call: Call<ApiResponse<Unit>>, t: Throwable) {
+                    Log.e("TambahLaporanActivity", "Gagal terhubung ke server", t)
                     Toast.makeText(this@TambahLaporanActivity, "Gagal terhubung ke server", Toast.LENGTH_SHORT).show()
                 }
             })
-
-            // Jika validasi lolos, lanjutkan menyimpan data
-            Log.d("TambahLaporanActivity", "ID Agenda Mediasi: $idAgendaMediasi")
-            Log.d("TambahLaporanActivity", "Tanggal Penutupan: $tanggalPenutupan")
-            Log.d("TambahLaporanActivity", "Status Laporan: $statusLaporan")
-            Log.d("TambahLaporanActivity", "Hasil Mediasi: $hasilMediasi")
-
-            Toast.makeText(this, "Data berhasil disimpan ke log", Toast.LENGTH_SHORT).show()
         }
     }
 
