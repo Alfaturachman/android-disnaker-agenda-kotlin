@@ -18,6 +18,7 @@ import com.example.disnakeragenda.R
 import com.example.disnakeragenda.api.ApiResponse
 import com.example.disnakeragenda.api.RetrofitClient
 import com.example.disnakeragenda.model.AgendaLaporan
+import com.example.disnakeragenda.model.LaporanRequest
 import com.google.android.material.textfield.TextInputEditText
 import java.util.Calendar
 import retrofit2.Call
@@ -101,14 +102,14 @@ class TambahLaporanActivity : AppCompatActivity() {
         // Button Simpan
         buttonSimpan.setOnClickListener {
             val selectedAgenda = spinnerAgendaMediasi.selectedItem as? AgendaLaporan
-            val idLaporan = selectedAgenda?.id_laporan
+            val idAgendaMediasi = selectedAgenda?.id
             val tanggalPenutupan = etTanggalPenutupan.text.toString().trim()
             val statusLaporan = spinnerStatusLaporan.selectedItem.toString()
             val hasilMediasi = etHasilMediasi.text.toString().trim()
 
             // Validasi input sebelum menyimpan
             when {
-                idLaporan == null -> {
+                idAgendaMediasi == null -> {
                     Toast.makeText(this, "Silakan pilih agenda mediasi terlebih dahulu!", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
@@ -126,8 +127,32 @@ class TambahLaporanActivity : AppCompatActivity() {
                 }
             }
 
+            // Buat request body
+            val laporanRequest = LaporanRequest(
+                idAgendaMediasi = idAgendaMediasi,
+                tanggalPenutupan = tanggalPenutupan,
+                statusLaporan = statusLaporan,
+                hasilMediasi = hasilMediasi
+            )
+
+            // Kirim data ke server
+            RetrofitClient.instance.simpanLaporan(laporanRequest).enqueue(object : Callback<ApiResponse<Unit>> {
+                override fun onResponse(call: Call<ApiResponse<Unit>>, response: Response<ApiResponse<Unit>>) {
+                    if (response.isSuccessful && response.body()?.status == true) {
+                        Toast.makeText(this@TambahLaporanActivity, "Laporan berhasil disimpan", Toast.LENGTH_SHORT).show()
+                        finish() // Tutup activity setelah berhasil menyimpan
+                    } else {
+                        Toast.makeText(this@TambahLaporanActivity, "Gagal menyimpan laporan", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                override fun onFailure(call: Call<ApiResponse<Unit>>, t: Throwable) {
+                    Toast.makeText(this@TambahLaporanActivity, "Gagal terhubung ke server", Toast.LENGTH_SHORT).show()
+                }
+            })
+
             // Jika validasi lolos, lanjutkan menyimpan data
-            Log.d("TambahLaporanActivity", "ID Laporan: $idLaporan")
+            Log.d("TambahLaporanActivity", "ID Agenda Mediasi: $idAgendaMediasi")
             Log.d("TambahLaporanActivity", "Tanggal Penutupan: $tanggalPenutupan")
             Log.d("TambahLaporanActivity", "Status Laporan: $statusLaporan")
             Log.d("TambahLaporanActivity", "Hasil Mediasi: $hasilMediasi")

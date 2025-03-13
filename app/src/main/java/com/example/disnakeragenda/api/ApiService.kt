@@ -3,6 +3,7 @@ package com.example.disnakeragenda.api
 import com.example.disnakeragenda.model.AgendaLaporan
 import com.example.disnakeragenda.model.TotalRekapData
 import com.example.disnakeragenda.model.AgendaMediasi
+import com.example.disnakeragenda.model.LaporanRequest
 import com.example.disnakeragenda.model.Mediator
 import com.example.disnakeragenda.model.StatsTotalData
 import com.example.disnakeragenda.model.TambahPelapor
@@ -68,4 +69,7 @@ interface ApiService {
     @Headers("Content-Type: application/json")
     @POST("get_spinner_agenda.php")
     fun getAgendaMediasi(@Body requestBody: HashMap<String, Int>): Call<ApiResponse<List<AgendaLaporan>>>
+
+    @POST("post_laporan_mediasi.php")
+    fun simpanLaporan(@Body request: LaporanRequest): Call<ApiResponse<Unit>>
 }
