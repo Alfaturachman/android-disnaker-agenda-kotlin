@@ -34,7 +34,6 @@ class TambahPelaporActivity : AppCompatActivity() {
     private lateinit var etNamaPihak2: TextInputEditText
     private lateinit var etTanggalMediasi: TextInputEditText
     private lateinit var etWaktuMediasi: TextInputEditText
-    private lateinit var etTempatMediasi: TextInputEditText
     private lateinit var etJenisKasus: TextInputEditText
     private lateinit var etDeskripsiKasus: TextInputEditText
     private var selectedDate: String = ""
@@ -57,7 +56,6 @@ class TambahPelaporActivity : AppCompatActivity() {
         etNamaPihak2 = findViewById(R.id.etNamaPihak2)
         etTanggalMediasi = findViewById(R.id.etTanggalMediasi)
         etWaktuMediasi = findViewById(R.id.etWaktuMediasi)
-        etTempatMediasi = findViewById(R.id.etTempatMediasi)
         etJenisKasus = findViewById(R.id.etJenisKasus)
         etDeskripsiKasus = findViewById(R.id.etDeskripsiKasus)
         buttonSimpan = findViewById(R.id.buttonSimpan)
@@ -116,14 +114,13 @@ class TambahPelaporActivity : AppCompatActivity() {
     private fun simpanMediasi() {
         val namaPihak1 = etNamaPihak1.text.toString().trim()
         val namaPihak2 = etNamaPihak2.text.toString().trim()
-        val tempatMediasi = etTempatMediasi.text.toString().trim()
         val jenisKasus = etJenisKasus.text.toString().trim()
         val deskripsiKasus = etDeskripsiKasus.text.toString().trim()
 
         // Validasi input
         if (namaPihak1.isEmpty() || namaPihak2.isEmpty() ||
             selectedDate.isEmpty() || selectedTime.isEmpty() ||
-            tempatMediasi.isEmpty() || jenisKasus.isEmpty() || deskripsiKasus.isEmpty()
+            jenisKasus.isEmpty() || deskripsiKasus.isEmpty()
         ) {
             Toast.makeText(this, "Semua field harus diisi!", Toast.LENGTH_SHORT).show()
             return
@@ -144,7 +141,6 @@ class TambahPelaporActivity : AppCompatActivity() {
             nama_pihak_dua = namaPihak2,
             tgl_mediasi = formattedDate,
             waktu_mediasi = formattedTime,
-            tempat = tempatMediasi,
             jenis_kasus = jenisKasus,
             deskripsi_kasus = deskripsiKasus
         )

@@ -17,5 +17,6 @@ data class AgendaMediasi (
     val file_pdf: String,
     val tgl_penutupan: String,
     val status_laporan: String,
-    val hasil_mediasi: String
+    val hasil_mediasi: String,
+    val nama_mediator: String
 )

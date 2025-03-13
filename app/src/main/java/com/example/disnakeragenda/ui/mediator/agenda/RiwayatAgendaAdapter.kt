@@ -16,7 +16,6 @@ import com.example.disnakeragenda.ui.mediator.agenda.detail.DetailAgendaActivity
 class RiwayatAgendaAdapter(
     private var agendaList: List<AgendaMediasi>,
     private val startForResult: ActivityResultLauncher<Intent>,
-    private val onRefresh: () -> Unit
 ) : RecyclerView.Adapter<RiwayatAgendaAdapter.AgendaViewHolder>() {
 
     class AgendaViewHolder(view: View) : RecyclerView.ViewHolder(view) {

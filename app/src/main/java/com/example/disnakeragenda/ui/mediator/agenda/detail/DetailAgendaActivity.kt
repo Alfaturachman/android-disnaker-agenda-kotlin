@@ -47,6 +47,7 @@ class DetailAgendaActivity : AppCompatActivity() {
     private lateinit var tvNamaFilePdf: TextView
     private lateinit var tvTanggalPenutupan: TextView
     private lateinit var tvHasilMediasi: TextView
+    private lateinit var tvNamaMediator: TextView
     private lateinit var cardViewEditAgenda: CardView
     private lateinit var layoutLaporan: LinearLayout
     private lateinit var layoutFilePdf: LinearLayout
@@ -78,6 +79,7 @@ class DetailAgendaActivity : AppCompatActivity() {
         tvNamaFilePdf = findViewById(R.id.tvNamaFilePdf)
         tvTanggalPenutupan = findViewById(R.id.tvTanggalPenutupan)
         tvHasilMediasi = findViewById(R.id.tvHasilMediasi)
+        tvNamaMediator = findViewById(R.id.tvNamaMediator)
         cardViewEditAgenda = findViewById(R.id.cardViewEditAgenda)
         layoutLaporan = findViewById(R.id.layoutLaporan)
         layoutFilePdf = findViewById(R.id.layoutFilePdf)
@@ -145,6 +147,7 @@ class DetailAgendaActivity : AppCompatActivity() {
                                 Log.d("API_RESPONSE", "Data berhasil diterima: $mediasi")
 
                                 layoutLaporan.visibility = View.GONE
+                                tvNamaMediator.text = mediasi.nama_mediator ?: "-"
 
                                 if (mediasi.id_laporan != null && mediasi.id_laporan != 0) {
                                     layoutLaporan.visibility = View.VISIBLE
