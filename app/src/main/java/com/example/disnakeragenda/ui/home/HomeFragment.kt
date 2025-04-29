@@ -27,7 +27,9 @@ import com.github.mikephil.charting.formatter.ValueFormatter
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Locale
 
 class HomeFragment : Fragment() {
 
@@ -82,6 +84,14 @@ class HomeFragment : Fragment() {
                 Toast.makeText(requireContext(), "Level pengguna tidak valid", Toast.LENGTH_SHORT).show()
             }
         }
+
+        // Ambil waktu hari ini
+        val calendar = Calendar.getInstance()
+        val dateFormat = SimpleDateFormat("yyyy", Locale("id", "ID"))
+        val bulanTahun = dateFormat.format(calendar.time)
+
+        // Tampilkan di TextView
+            binding.titleLaporanStats.text = "Statistik Agenda pada $bulanTahun"
 
         // BarChart binding
         chartData = binding?.chartData!!

@@ -1,10 +1,13 @@
 package com.example.disnakeragenda.ui.mediator.agenda.detail
 
 import android.annotation.SuppressLint
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.ArrayAdapter
+import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -25,6 +28,7 @@ import com.example.disnakeragenda.model.UpdateMediator
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.Calendar
 
 class DetailAgendaActivity : AppCompatActivity() {
 
@@ -93,7 +97,7 @@ class DetailAgendaActivity : AppCompatActivity() {
 
         layoutFilePdf.visibility = View.GONE
 
-        // Ambil data dari intent
+// Ambil data dari intent
         val intent = intent
         idAgenda = intent.getIntExtra("id_mediasi", 0)
         idMediator = intent.getIntExtra("id_mediator", 0)
@@ -107,7 +111,18 @@ class DetailAgendaActivity : AppCompatActivity() {
         val deskripsiKasus = intent.getStringExtra("deskripsi_kasus")
         val namaFilePdf = intent.getStringExtra("file_pdf")
 
-        statusPelaporan = intent.getStringExtra("status").toString()
+        val statusPelaporan = intent.getStringExtra("status").toString()
+        Log.d("TAG", "onCreate: statusPelaporan = $statusPelaporan")
+
+        if (statusPelaporan.equals("Disetujui", ignoreCase = true) ||
+            statusPelaporan.equals("Ditolak", ignoreCase = true)) {
+            Log.d("TAG", "Status is 'Disetujui' or 'Selesai'. Hiding cardViewEditAgenda.")
+            cardViewEditAgenda.visibility = View.GONE
+        } else {
+            Log.d("TAG", "Status is neither 'Disetujui' nor 'Selesai'. Showing cardViewEditAgenda.")
+            cardViewEditAgenda.visibility = View.VISIBLE
+        }
+
         tvStatusPelaporan.text = statusPelaporan
 
         tvNomorMediasi.text = "#$nomorMediasi"
@@ -228,47 +243,86 @@ class DetailAgendaActivity : AppCompatActivity() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_edit_agenda, null)
         val spinnerEditAgenda = dialogView.findViewById<Spinner>(R.id.spinnerEditAgenda)
         val spinnerStatus = dialogView.findViewById<Spinner>(R.id.spinnerStatus)
+        val etWaktu = dialogView.findViewById<EditText>(R.id.etWaktu)
+        val etTanggal = dialogView.findViewById<EditText>(R.id.etTanggal)
 
-        // Set adapter untuk mediator
+        // === Spinner Edit Agenda ===
         spinnerEditAgenda.adapter = mediatorAdapter
-
-        // Tentukan posisi default berdasarkan idMediator
         val defaultPosition = mediatorList.indexOfFirst { it.id_mediator == idMediator }
         spinnerEditAgenda.setSelection(if (defaultPosition != -1) defaultPosition + 1 else 0)
 
-        // Tambahkan adapter untuk spinnerStatus
+        // === Spinner Status ===
         val statusList = listOf("diproses", "ditolak", "disetujui")
         val statusAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, statusList)
         spinnerStatus.adapter = statusAdapter
-
-        // Set status default jika ada
         val defaultStatusPosition = statusList.indexOf(statusPelaporan)
         spinnerStatus.setSelection(if (defaultStatusPosition != -1) defaultStatusPosition else 0)
 
-        // Buat AlertDialog
+        // === Time Picker untuk Waktu ===
+        etWaktu.isFocusable = false
+        etWaktu.setOnClickListener {
+            val calendar = Calendar.getInstance()
+            val hour = calendar.get(Calendar.HOUR_OF_DAY)
+            val minute = calendar.get(Calendar.MINUTE)
+
+            val timePicker = TimePickerDialog(this, { _, selectedHour, selectedMinute ->
+                val selectedTime = String.format("%02d:%02d", selectedHour, selectedMinute)
+                etWaktu.setText(selectedTime)
+            }, hour, minute, true)
+
+            timePicker.show()
+        }
+
+        // === Date Picker untuk Tanggal ===
+        etTanggal.isFocusable = false
+        etTanggal.setOnClickListener {
+            val calendar = Calendar.getInstance()
+            val year = calendar.get(Calendar.YEAR)
+            val month = calendar.get(Calendar.MONTH)
+            val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+            val datePickerDialog = DatePickerDialog(this, { _, y, m, d ->
+                val selectedDate = String.format("%04d-%02d-%02d", y, m + 1, d)
+                etTanggal.setText(selectedDate)
+            }, year, month, day)
+            datePickerDialog.show()
+        }
+
+        // === AlertDialog ===
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Edit Agenda")
             .setView(dialogView)
             .setPositiveButton("OK") { dialog, _ ->
                 val selectedPosition = spinnerEditAgenda.selectedItemPosition
                 val selectedStatus = spinnerStatus.selectedItem.toString()
+                val selectedWaktu = etWaktu.text.toString()
+                val selectedTanggal = etTanggal.text.toString()
 
-                // Pastikan pengguna memilih mediator yang valid
                 if (selectedPosition == 0) {
                     Toast.makeText(this, "Silakan pilih mediator!", Toast.LENGTH_SHORT).show()
                     return@setPositiveButton
                 }
 
+                if (selectedTanggal.isBlank()) {
+                    Toast.makeText(this, "Silakan pilih tanggal!", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+
+                if (selectedWaktu.isBlank()) {
+                    Toast.makeText(this, "Silakan pilih waktu!", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+
                 val selectedMediator = mediatorAdapter.getItem(selectedPosition) as Mediator
                 handleEditAgenda(selectedMediator.id_mediator, selectedMediator.nama, idAgenda, selectedStatus)
-                dialog.dismiss()
-            }
-            .setNegativeButton("Batal") { dialog, _ ->
-                dialog.dismiss()
-            }
 
-        val dialog = builder.create()
-        dialog.show()
+                Log.d("DetailAgendaActivity", "Tanggal dipilih: $selectedTanggal, Waktu: $selectedWaktu")
+
+                dialog.dismiss()
+            }
+            .setNegativeButton("Batal") { dialog, _ -> dialog.dismiss() }
+
+        builder.create().show()
     }
 
     private fun handleEditAgenda(mediatorId: Int, mediatorName: String, idAgenda: Int, selectedStatus: String) {
