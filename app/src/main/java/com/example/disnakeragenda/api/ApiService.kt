@@ -62,6 +62,9 @@ interface ApiService {
     @POST("update_mediator.php")
     fun updateMediator(@Body request: UpdateMediator): Call<ApiResponse<Unit>>
 
+    @POST("delete_mediasi.php")
+    fun deleteMediasi(@Body body: RequestBody): Call<ResponseBody>
+
     // Laporan
     @GET("get_all_laporan.php")
     fun getLaporan(): Call<ApiResponse<List<AgendaLaporan>>>
@@ -72,4 +75,7 @@ interface ApiService {
 
     @POST("post_laporan_mediasi.php")
     fun simpanLaporan(@Body request: LaporanRequest): Call<ApiResponse<Unit>>
+
+    @POST("delete_laporan.php")
+    fun deleteLaporan(@Body body: RequestBody): Call<ResponseBody>
 }

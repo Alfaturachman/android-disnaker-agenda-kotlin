@@ -1,20 +1,35 @@
 package com.example.disnakeragenda.ui.pelapor
 
+import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.disnakeragenda.R
+import com.example.disnakeragenda.api.RetrofitClient
 import com.example.disnakeragenda.model.AgendaMediasi
 import com.example.disnakeragenda.helpers.DateHelper
 import com.example.disnakeragenda.ui.mediator.laporan.detail.DetailLaporanActivity
 import com.example.disnakeragenda.ui.pelapor.detail.DetailPelaporActivity
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.ResponseBody
+import org.json.JSONObject
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class RiwayatPelaporAdapter(
-    private var dataList: List<AgendaMediasi>
+    private var dataList: List<AgendaMediasi>,
+    private val startForResult: ActivityResultLauncher<Intent>,
+    private val onDeleteSuccess: () -> Unit
 ) :
     RecyclerView.Adapter<RiwayatPelaporAdapter.ViewHolder>() {
 
@@ -24,6 +39,7 @@ class RiwayatPelaporAdapter(
         val tvStatus: TextView = view.findViewById(R.id.tvStatus)
         val tvJenisKasus: TextView = view.findViewById(R.id.tvJenisKasus)
         val cardView: View = view.findViewById(R.id.cardView)
+        val btnDelete: ImageView = itemView.findViewById(R.id.btnHapus)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -76,6 +92,61 @@ class RiwayatPelaporAdapter(
             }
             context.startActivity(intent)
         }
+
+        // Daftar status yang menyebabkan tombol hapus dinonaktifkan
+        val statusNonAktif = listOf("disetujui", "dilanjut ke pengadilan", "selesai")
+
+        val isHapusDisabled = statusNonAktif.any { it.equals(statusText, ignoreCase = true) }
+
+        holder.btnDelete.isEnabled = !isHapusDisabled
+        holder.btnDelete.alpha = if (isHapusDisabled) 0.5f else 1.0f
+
+        holder.btnDelete.setOnClickListener {
+            if (!isHapusDisabled) {
+                showDeleteConfirmationDialog(context, item.id)
+            }
+        }
+    }
+
+    private fun showDeleteConfirmationDialog(context: Context, mediasiId: Int?) {
+        if (mediasiId == null) return
+
+        AlertDialog.Builder(context)
+            .setTitle("Hapus Petugas")
+            .setMessage("Apakah Anda yakin ingin menghapus mediasi ini?")
+            .setPositiveButton("Hapus") { dialog, _ ->
+                deleteLaporan(mediasiId, context)
+                dialog.dismiss()
+            }
+            .setNegativeButton("Batal") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .setCancelable(true)
+            .show()
+    }
+
+    private fun deleteLaporan(mediasiId: Int, context: Context) {
+        val jsonObject = JSONObject().apply {
+            put("id_mediasi", mediasiId)
+        }
+
+        val requestBody = jsonObject.toString()
+            .toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
+
+        RetrofitClient.instance.deleteMediasi(requestBody).enqueue(object : Callback<ResponseBody> {
+            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                if (response.isSuccessful) {
+                    Toast.makeText(context, "Mediasi berhasil dihapus", Toast.LENGTH_SHORT).show()
+                    onDeleteSuccess.invoke()
+                } else {
+                    Toast.makeText(context, "Gagal menghapus Mediasi", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 
     override fun getItemCount(): Int = dataList.size

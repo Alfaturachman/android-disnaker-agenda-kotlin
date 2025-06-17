@@ -51,7 +51,10 @@ class RiwayatAgendaActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         // Inisialisasi adapter kosong
-        agendaAdapter = RiwayatAgendaAdapter(emptyList(), startForResult)
+        agendaAdapter = RiwayatAgendaAdapter(emptyList(), startForResult) {
+            refreshData()
+        }
+
         recyclerView.adapter = agendaAdapter
 
         // Ambil data dari API

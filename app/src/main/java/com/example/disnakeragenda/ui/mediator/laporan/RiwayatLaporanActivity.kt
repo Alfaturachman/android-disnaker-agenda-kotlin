@@ -15,6 +15,7 @@ import com.example.disnakeragenda.R
 import com.example.disnakeragenda.api.ApiResponse
 import com.example.disnakeragenda.api.RetrofitClient
 import com.example.disnakeragenda.model.AgendaLaporan
+import com.example.disnakeragenda.model.AgendaMediasi
 import com.example.disnakeragenda.ui.mediator.agenda.RiwayatAgendaAdapter
 import retrofit2.Call
 import retrofit2.Callback
@@ -25,6 +26,7 @@ class RiwayatLaporanActivity : AppCompatActivity() {
     private var idPelapor: Int = -1
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: RiwayatLaporanAdapter
+    private var laporanList: List<AgendaLaporan> = listOf()
 
     // ActivityResultLauncher
     val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -52,7 +54,10 @@ class RiwayatLaporanActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.recyclerViewRiwayatLaporan)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        adapter = RiwayatLaporanAdapter(emptyList())
+        adapter = RiwayatLaporanAdapter(emptyList(), startForResult) {
+            refreshData()
+        }
+
         recyclerView.adapter = adapter
 
         fetchRiwayatPelaporan()
@@ -71,9 +76,10 @@ class RiwayatLaporanActivity : AppCompatActivity() {
                     val responseBody = response.body()
                     if (responseBody?.status == true) {
                         Log.d("RiwayatPelapor", "Data berhasil diterima: ${responseBody.data}")
-                        responseBody.data?.let {
-                            adapter.updateData(it)
-                        }
+                        laporanList = responseBody.data ?: listOf()
+
+                        // Update adapter dengan data terbaru
+                        adapter.updateData(laporanList)
                     } else {
                         Log.e("RiwayatPelapor", "Gagal mendapatkan data: ${responseBody?.message}")
                     }

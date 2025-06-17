@@ -15,6 +15,7 @@ import com.example.disnakeragenda.R
 import com.example.disnakeragenda.api.ApiResponse
 import com.example.disnakeragenda.api.RetrofitClient
 import com.example.disnakeragenda.model.AgendaMediasi
+import com.example.disnakeragenda.ui.mediator.agenda.RiwayatAgendaAdapter
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -54,7 +55,11 @@ class RiwayatPelaporActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.recyclerViewRiwayatPelapor)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        adapter = RiwayatPelaporAdapter(emptyList())
+        // Inisialisasi adapter kosong
+        adapter = RiwayatPelaporAdapter(emptyList(), startForResult) {
+            refreshData()
+        }
+
         recyclerView.adapter = adapter
 
         fetchRiwayatPelaporan(idPelapor)
