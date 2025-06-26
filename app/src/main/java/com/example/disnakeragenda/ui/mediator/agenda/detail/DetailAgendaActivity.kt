@@ -106,7 +106,7 @@ class DetailAgendaActivity : AppCompatActivity() {
         val namaPihak2 = intent.getStringExtra("nama_pihak_dua")
         val tanggalMediasi = intent.getStringExtra("tanggal_mediasi")
         val waktuMediasi = intent.getStringExtra("waktu_mediasi")
-        val tempatMediasi = intent.getStringExtra("tempat_mediasi")
+        val tempatMediasi = intent.getStringExtra("tempat_mediasi") ?: "-"
         val jenisKasus = intent.getStringExtra("jenis_kasus")
         val deskripsiKasus = intent.getStringExtra("deskripsi_kasus")
         val namaFilePdf = intent.getStringExtra("file_pdf")
@@ -245,6 +245,8 @@ class DetailAgendaActivity : AppCompatActivity() {
         val spinnerStatus = dialogView.findViewById<Spinner>(R.id.spinnerStatus)
         val etWaktu = dialogView.findViewById<EditText>(R.id.etWaktu)
         val etTanggal = dialogView.findViewById<EditText>(R.id.etTanggal)
+        val etTempatMediasi = dialogView.findViewById<EditText>(R.id.etTempatMediasi)
+
 
         // === Spinner Edit Agenda ===
         spinnerEditAgenda.adapter = mediatorAdapter
@@ -297,6 +299,7 @@ class DetailAgendaActivity : AppCompatActivity() {
                 val selectedStatus = spinnerStatus.selectedItem.toString()
                 val selectedWaktu = etWaktu.text.toString()
                 val selectedTanggal = etTanggal.text.toString()
+                val selectedTempat = etTempatMediasi.text.toString()
 
                 if (selectedPosition == 0) {
                     Toast.makeText(this, "Silakan pilih mediator!", Toast.LENGTH_SHORT).show()
@@ -320,7 +323,8 @@ class DetailAgendaActivity : AppCompatActivity() {
                     idAgenda = idAgenda,
                     selectedStatus = selectedStatus,
                     selectedWaktu = selectedWaktu,
-                    selectedTanggal = selectedTanggal
+                    selectedTanggal = selectedTanggal,
+                    tempatMediasi = selectedTempat
                 )
 
                 dialog.dismiss()
@@ -336,7 +340,8 @@ class DetailAgendaActivity : AppCompatActivity() {
         idAgenda: Int,
         selectedStatus: String,
         selectedWaktu: String,
-        selectedTanggal: String
+        selectedTanggal: String,
+        tempatMediasi: String // Add this parameter
     ) {
         Log.d("EditAgenda", "Mediator ID: $mediatorId")
         Log.d("EditAgenda", "Mediator Name: $mediatorName")
@@ -344,6 +349,7 @@ class DetailAgendaActivity : AppCompatActivity() {
         Log.d("EditAgenda", "Status: $selectedStatus")
         Log.d("EditAgenda", "Waktu: $selectedWaktu")
         Log.d("EditAgenda", "Tanggal: $selectedTanggal")
+        Log.d("EditAgenda", "Tempat Mediasi: $tempatMediasi")
 
         // Buat objek UpdateMediator
         val requestBody = UpdateMediator(
@@ -351,6 +357,7 @@ class DetailAgendaActivity : AppCompatActivity() {
             id_mediator = mediatorId,
             status = selectedStatus,
             waktu_mediasi = selectedWaktu,
+            tempat_mediasi = tempatMediasi,
             tgl_mediasi = selectedTanggal
         )
 
@@ -359,26 +366,33 @@ class DetailAgendaActivity : AppCompatActivity() {
         // Panggil API menggunakan Retrofit
         RetrofitClient.instance.updateMediator(requestBody).enqueue(object : Callback<ApiResponse<Unit>> {
             override fun onResponse(call: Call<ApiResponse<Unit>>, response: Response<ApiResponse<Unit>>) {
+                Log.d("DetailAgendaActivity", "onResponse() called")
+
                 if (response.isSuccessful) {
                     val result = response.body()
                     Log.d("DetailAgendaActivity", "Response berhasil diterima: $result")
 
                     if (result != null && result.status) {
+                        Log.d("DetailAgendaActivity", "Update mediator berhasil")
                         Toast.makeText(this@DetailAgendaActivity, "Agenda berhasil diupdate!", Toast.LENGTH_SHORT).show()
                         setResult(RESULT_OK)
                         finish()
                     } else {
                         val errorBody = response.errorBody()?.string()
-                        Log.e("DetailAgendaActivity", "Gagal mengupdate agenda. Error: $errorBody")
+                        Log.e("DetailAgendaActivity", "Gagal mengupdate agenda. Response status false.")
+                        Log.e("DetailAgendaActivity", "Isi errorBody (server): $errorBody")
                         Toast.makeText(this@DetailAgendaActivity, "Gagal mengupdate agenda!", Toast.LENGTH_SHORT).show()
                     }
                 } else {
                     Log.e("DetailAgendaActivity", "Response error: ${response.code()} - ${response.message()}")
+                    val rawBody = response.errorBody()?.string()
+                    Log.e("DetailAgendaActivity", "Raw error body: $rawBody")
                     Toast.makeText(this@DetailAgendaActivity, "Error: ${response.message()}", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<ApiResponse<Unit>>, t: Throwable) {
+                Log.e("DetailAgendaActivity", "onFailure() called")
                 Log.e("DetailAgendaActivity", "Request failed: ${t.message}", t)
                 Toast.makeText(this@DetailAgendaActivity, "Gagal menghubungi server!", Toast.LENGTH_SHORT).show()
             }

@@ -35,7 +35,7 @@ class AgendaSpinnerAdapter(context: Context, private val agendaList: List<Agenda
             "Pilih Agenda"
         } else {
             // Format: "nama_pihak_satu & nama_pihak_dua - nama_kasus"
-            "${agenda.nama_pihak_satu ?: ""} & ${agenda.nama_pihak_dua ?: ""} - ${agenda.nama_kasus ?: ""}"
+            "${agenda.nama_pihak_satu ?: ""} & ${agenda.nama_pihak_dua ?: ""} - ${agenda.jenis_kasus ?: ""}"
         }
     }
 }

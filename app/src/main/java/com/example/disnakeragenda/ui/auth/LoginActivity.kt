@@ -105,10 +105,13 @@ class LoginActivity : AppCompatActivity() {
                                 userDetails.has("id_mediator") -> userDetails.getString("id_mediator").toInt()
                                 else -> 0
                             }
+
                             val userId = jsonResponse.getString("id_user").toInt()
                             val userEmail = jsonResponse.getString("email")
                             val userLevel = jsonResponse.getString("level")
                             val userNama = userDetails.getString("nama")
+                            val userTelp = userDetails.optString("telp", "")
+                            val userAlamat = userDetails.optString("alamat", "")
 
                             val sharedPreferences = getSharedPreferences("UserSession", MODE_PRIVATE)
                             val editor = sharedPreferences.edit()
@@ -117,6 +120,8 @@ class LoginActivity : AppCompatActivity() {
                             editor.putString("email", userEmail)
                             editor.putString("level", userLevel)
                             editor.putString("nama", userNama)
+                            editor.putString("telp", userTelp)
+                            editor.putString("alamat", userAlamat)
                             editor.apply()
 
                             Toast.makeText(this@LoginActivity, "Login Berhasil", Toast.LENGTH_SHORT).show()

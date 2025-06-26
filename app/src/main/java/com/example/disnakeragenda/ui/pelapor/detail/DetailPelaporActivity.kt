@@ -83,7 +83,7 @@ class DetailPelaporActivity : AppCompatActivity() {
         val namaPihak2 = intent.getStringExtra("nama_pihak_dua")
         val tanggalMediasi = intent.getStringExtra("tanggal_mediasi")
         val waktuMediasi = intent.getStringExtra("waktu_mediasi")
-        val tempatMediasi = intent.getStringExtra("tempat_mediasi")
+        val tempatMediasi = intent.getStringExtra("tempat_mediasi") ?: "-"
         val jenisKasus = intent.getStringExtra("jenis_kasus")
         val deskripsiKasus = intent.getStringExtra("deskripsi_kasus")
         val namaFilePdf = intent.getStringExtra("file_pdf")

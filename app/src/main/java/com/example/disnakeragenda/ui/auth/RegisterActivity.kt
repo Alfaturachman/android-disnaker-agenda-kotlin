@@ -103,7 +103,7 @@ class RegisterActivity : AppCompatActivity() {
             "password" to password,
             "nama" to nama,
             "perusahaan" to perusahaan,
-            "no_hp" to telp,
+            "telp" to telp,
             "alamat" to alamat
         )
 
@@ -127,9 +127,10 @@ class RegisterActivity : AppCompatActivity() {
                         val status = jsonResponse.optBoolean("status", false)
                         val message = jsonResponse.optString("message", "Unknown error")
 
-                        if (status && message.contains("Data pemasok berhasil ditambahkan!")) {
+                        if (status) {
                             Toast.makeText(this@RegisterActivity, "Register berhasil", Toast.LENGTH_SHORT).show()
 
+                            // Navigasi ke halaman login setelah registrasi berhasil
                             val intent = Intent(this@RegisterActivity, LoginActivity::class.java)
                             startActivity(intent)
                             finish()

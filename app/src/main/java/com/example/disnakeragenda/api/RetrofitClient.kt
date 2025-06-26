@@ -6,14 +6,14 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
-    private val ip: String = "192.168.1.5"
+    private val ip: String = "192.168.0.106"
 
     private val BASE_URL = "http://$ip/disnaker-agenda/api/"
 
     private val client = OkHttpClient.Builder().build()
 
     private val gson = GsonBuilder()
-        .setLenient() // This is the key fix - makes Gson more tolerant of malformed JSON
+        .setLenient()
         .create()
 
     private val retrofit by lazy {

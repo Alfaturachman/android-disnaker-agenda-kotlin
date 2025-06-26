@@ -40,6 +40,11 @@ class ProfileFragment : Fragment() {
         binding.tvNama.text = userNama
         binding.tvLevel.text = level
 
+        binding.cardViewProfile.setOnClickListener {
+            val intent = Intent(requireActivity(), DetailProfileActivity::class.java)
+            startActivity(intent)
+        }
+
         binding.cardViewLogout.setOnClickListener {
             AlertDialog.Builder(requireContext())
                 .setTitle("Konfirmasi Logout")

@@ -76,7 +76,7 @@ class RiwayatPelaporAdapter(
 
         // Button CardView
         holder.cardView.setOnClickListener {
-            val intent = Intent(context, DetailLaporanActivity::class.java).apply {
+            val intent = Intent(context, DetailPelaporActivity::class.java).apply {
                 putExtra("id_mediasi", item.id)
                 putExtra("id_laporan", item.id_laporan)
                 putExtra("nomor_mediasi", item.nomor_mediasi)
@@ -86,8 +86,8 @@ class RiwayatPelaporAdapter(
                 putExtra("waktu_mediasi", item.waktu_mediasi)
                 putExtra("status", item.status)
                 putExtra("jenis_kasus", item.jenis_kasus)
-                putExtra("deskripsi_kasus", item.jenis_kasus)
-                putExtra("tempat_mediasi", item.jenis_kasus)
+                putExtra("deskripsi_kasus", item.deskripsi_kasus)
+                putExtra("tempat_mediasi", item.tempat)
                 putExtra("file_pdf", item.file_pdf)
             }
             context.startActivity(intent)
