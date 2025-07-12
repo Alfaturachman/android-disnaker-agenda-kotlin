@@ -1,13 +1,9 @@
-package com.example.disnakeragenda.ui.mediator.agenda.detail
+package com.example.disnakeragenda.ui.admin.agenda.detail
 
 import android.annotation.SuppressLint
-import android.app.DatePickerDialog
-import android.app.TimePickerDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.ArrayAdapter
-import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -24,12 +20,10 @@ import com.example.disnakeragenda.api.RetrofitClient
 import com.example.disnakeragenda.helpers.DateHelper
 import com.example.disnakeragenda.model.AgendaMediasi
 import com.example.disnakeragenda.model.Mediator
-import com.example.disnakeragenda.model.UpdateAgendaMediator
-import com.example.disnakeragenda.ui.admin.agenda.detail.AgendaSpinnerAdapter
+import com.example.disnakeragenda.model.UpdateAgendaAdmin
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.util.Calendar
 
 class DetailAgendaActivity : AppCompatActivity() {
 
@@ -60,7 +54,7 @@ class DetailAgendaActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_detail_agenda)
+        setContentView(R.layout.activity_detail_agenda_admin)
         supportActionBar?.hide()
 
         // Set status bar color dan mode light
@@ -98,7 +92,7 @@ class DetailAgendaActivity : AppCompatActivity() {
 
         layoutFilePdf.visibility = View.GONE
 
-// Ambil data dari intent
+        // Ambil data dari intent
         val intent = intent
         idAgenda = intent.getIntExtra("id_mediasi", 0)
         idMediator = intent.getIntExtra("id_mediator", 0)
@@ -136,6 +130,7 @@ class DetailAgendaActivity : AppCompatActivity() {
         tvDeskripsiKasus.text = deskripsiKasus
         tvNamaFilePdf.text = namaFilePdf
 
+        fetchMediatorSpinner()
         fetchDetailMediasi(idAgenda)
     }
 
@@ -192,81 +187,75 @@ class DetailAgendaActivity : AppCompatActivity() {
             })
     }
 
+    private fun fetchMediatorSpinner() {
+        RetrofitClient.instance.getMediator().enqueue(object : Callback<ApiResponse<List<Mediator>>> {
+            override fun onResponse(
+                call: Call<ApiResponse<List<Mediator>>>,
+                response: Response<ApiResponse<List<Mediator>>>
+            ) {
+                if (response.isSuccessful) {
+                    response.body()?.let { apiResponse ->
+                        if (apiResponse.status) {
+                            // Pastikan apiResponse.data adalah List<Mediator>
+                            mediatorList.apply {
+                                clear()
+                                addAll(apiResponse.data ?: emptyList())
+                            }
+                            setupSpinner()
+                        } else {
+                            showToast("Gagal mengambil data mediator: Response tidak valid")
+                        }
+                    } ?: showToast("Response body null")
+                } else {
+                    showToast("Gagal mengambil data mediator: ${response.message()}")
+                }
+            }
+
+            override fun onFailure(call: Call<ApiResponse<List<Mediator>>>, t: Throwable) {
+                showToast("Error: ${t.localizedMessage}")
+                Log.e("fetchMediatorData", "Request failed", t)
+            }
+        })
+    }
+
     private fun showToast(message: String) {
         Toast.makeText(this@DetailAgendaActivity, message, Toast.LENGTH_SHORT).show()
     }
 
+    private fun setupSpinner() {
+        // Tambahkan opsi default di awal list
+        val defaultMediator = Mediator(
+            id_mediator = -1, nama = "- Pilih Mediator -",
+            id_user = 0, telp = "", nip = "", bidang = "", alamat = ""
+        )
+        val updatedMediatorList = mutableListOf(defaultMediator) + mediatorList
+
+        mediatorAdapter = AgendaSpinnerAdapter(this, updatedMediatorList)
+    }
+
     @SuppressLint("MissingInflatedId")
     private fun showEditAgendaDialog() {
-        val dialogView = layoutInflater.inflate(R.layout.dialog_edit_agenda, null)
-        val spinnerStatus = dialogView.findViewById<Spinner>(R.id.spinnerStatus)
-        val etWaktu = dialogView.findViewById<EditText>(R.id.etWaktu)
-        val etTanggal = dialogView.findViewById<EditText>(R.id.etTanggal)
-        val etTempatMediasi = dialogView.findViewById<EditText>(R.id.etTempatMediasi)
+        val dialogView = layoutInflater.inflate(R.layout.dialog_edit_agenda_admin, null)
+        val spinnerEditAgenda = dialogView.findViewById<Spinner>(R.id.spinnerEditAgenda)
 
-        // === Spinner Status ===
-        val statusList = listOf("diproses", "ditolak", "disetujui")
-        val statusAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, statusList)
-        spinnerStatus.adapter = statusAdapter
-        val defaultStatusPosition = statusList.indexOf(statusPelaporan)
-        spinnerStatus.setSelection(if (defaultStatusPosition != -1) defaultStatusPosition else 0)
 
-        // === Time Picker untuk Waktu ===
-        etWaktu.isFocusable = false
-        etWaktu.setOnClickListener {
-            val calendar = Calendar.getInstance()
-            val hour = calendar.get(Calendar.HOUR_OF_DAY)
-            val minute = calendar.get(Calendar.MINUTE)
-
-            val timePicker = TimePickerDialog(this, { _, selectedHour, selectedMinute ->
-                val selectedTime = String.format("%02d:%02d", selectedHour, selectedMinute)
-                etWaktu.setText(selectedTime)
-            }, hour, minute, true)
-
-            timePicker.show()
-        }
-
-        // === Date Picker untuk Tanggal ===
-        etTanggal.isFocusable = false
-        etTanggal.setOnClickListener {
-            val calendar = Calendar.getInstance()
-            val year = calendar.get(Calendar.YEAR)
-            val month = calendar.get(Calendar.MONTH)
-            val day = calendar.get(Calendar.DAY_OF_MONTH)
-
-            val datePickerDialog = DatePickerDialog(this, { _, y, m, d ->
-                val selectedDate = String.format("%04d-%02d-%02d", y, m + 1, d)
-                etTanggal.setText(selectedDate)
-            }, year, month, day)
-            datePickerDialog.show()
-        }
+        // === Spinner Edit Agenda ===
+        spinnerEditAgenda.adapter = mediatorAdapter
+        val defaultPosition = mediatorList.indexOfFirst { it.id_mediator == idMediator }
+        spinnerEditAgenda.setSelection(if (defaultPosition != -1) defaultPosition + 1 else 0)
 
         // === AlertDialog ===
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Edit Agenda")
             .setView(dialogView)
             .setPositiveButton("OK") { dialog, _ ->
-                val selectedStatus = spinnerStatus.selectedItem.toString()
-                val selectedWaktu = etWaktu.text.toString()
-                val selectedTanggal = etTanggal.text.toString()
-                val selectedTempat = etTempatMediasi.text.toString()
+                val selectedPosition = spinnerEditAgenda.selectedItemPosition
 
-                if (selectedTanggal.isBlank()) {
-                    Toast.makeText(this, "Silakan pilih tanggal!", Toast.LENGTH_SHORT).show()
-                    return@setPositiveButton
-                }
-
-                if (selectedWaktu.isBlank()) {
-                    Toast.makeText(this, "Silakan pilih waktu!", Toast.LENGTH_SHORT).show()
-                    return@setPositiveButton
-                }
-
+                val selectedMediator = mediatorAdapter.getItem(selectedPosition) as Mediator
                 handleEditAgenda(
+                    mediatorId = selectedMediator.id_mediator,
+                    mediatorName = selectedMediator.nama,
                     idAgenda = idAgenda,
-                    selectedStatus = selectedStatus,
-                    selectedWaktu = selectedWaktu,
-                    selectedTanggal = selectedTanggal,
-                    tempatMediasi = selectedTempat
                 )
 
                 dialog.dismiss()
@@ -277,31 +266,24 @@ class DetailAgendaActivity : AppCompatActivity() {
     }
 
     private fun handleEditAgenda(
+        mediatorId: Int,
+        mediatorName: String,
         idAgenda: Int,
-        selectedStatus: String,
-        selectedWaktu: String,
-        selectedTanggal: String,
-        tempatMediasi: String // Add this parameter
     ) {
+        Log.d("EditAgenda", "Mediator ID: $mediatorId")
+        Log.d("EditAgenda", "Mediator Name: $mediatorName")
         Log.d("EditAgenda", "Agenda ID: $idAgenda")
-        Log.d("EditAgenda", "Status: $selectedStatus")
-        Log.d("EditAgenda", "Waktu: $selectedWaktu")
-        Log.d("EditAgenda", "Tanggal: $selectedTanggal")
-        Log.d("EditAgenda", "Tempat Mediasi: $tempatMediasi")
 
         // Buat objek UpdateMediator
-        val requestBody = UpdateAgendaMediator(
+        val requestBody = UpdateAgendaAdmin(
             id = idAgenda,
-            status = selectedStatus,
-            waktu_mediasi = selectedWaktu,
-            tempat_mediasi = tempatMediasi,
-            tgl_mediasi = selectedTanggal
+            id_mediator = mediatorId,
         )
 
         Log.d("DetailAgendaActivity", "Request yang dikirim: $requestBody")
 
         // Panggil API menggunakan Retrofit
-        RetrofitClient.instance.updateMediator(requestBody).enqueue(object : Callback<ApiResponse<Unit>> {
+        RetrofitClient.instance.updateAgendaAdmin(requestBody).enqueue(object : Callback<ApiResponse<Unit>> {
             override fun onResponse(call: Call<ApiResponse<Unit>>, response: Response<ApiResponse<Unit>>) {
                 Log.d("DetailAgendaActivity", "onResponse() called")
 

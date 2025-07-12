@@ -65,11 +65,6 @@ class RiwayatPelaporActivity : AppCompatActivity() {
         fetchRiwayatPelaporan(idPelapor)
     }
 
-    private fun getUserIdFromSharedPreferences(): Int {
-        val sharedPreferences = this.getSharedPreferences("UserSession", Context.MODE_PRIVATE)
-        return sharedPreferences.getInt("id_user", -1)
-    }
-
     private fun fetchRiwayatPelaporan(idPelapor: Int) {
         val requestBody = hashMapOf("id_pelapor" to idPelapor)
 
@@ -106,5 +101,10 @@ class RiwayatPelaporActivity : AppCompatActivity() {
 
     private fun refreshData() {
         fetchRiwayatPelaporan(idPelapor)
+    }
+
+    private fun getUserIdFromSharedPreferences(): Int {
+        val sharedPreferences = this.getSharedPreferences("UserSession", Context.MODE_PRIVATE)
+        return sharedPreferences.getInt("id_user", -1)
     }
 }

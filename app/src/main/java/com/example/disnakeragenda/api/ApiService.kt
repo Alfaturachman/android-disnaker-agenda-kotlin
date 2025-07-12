@@ -7,7 +7,9 @@ import com.example.disnakeragenda.model.LaporanRequest
 import com.example.disnakeragenda.model.Mediator
 import com.example.disnakeragenda.model.StatsTotalData
 import com.example.disnakeragenda.model.TambahPelapor
-import com.example.disnakeragenda.model.UpdateMediator
+import com.example.disnakeragenda.model.UpdateAgendaAdmin
+import com.example.disnakeragenda.model.UpdateAgendaMediator
+import com.example.disnakeragenda.model.UserProfile
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -53,14 +55,20 @@ interface ApiService {
     @POST("get_stats_mediator.php")
     fun StatsDataMediator(@Body requestBody: HashMap<String, Int>): Call<ApiResponse<List<StatsTotalData>>>
 
+    @POST("get_all_agenda_mediator.php")
+    fun getIdMediator(@Body requestBody: HashMap<String, Int>): Call<ApiResponse<List<AgendaMediasi>>>
+
     @GET("get_all_agenda.php")
-    fun getAgenda(): Call<ApiResponse<List<AgendaMediasi>>>
+    fun getAllAgenda(): Call<ApiResponse<List<AgendaMediasi>>>
 
     @GET("get_all_mediator.php")
     fun getMediator(): Call<ApiResponse<List<Mediator>>>
 
-    @POST("update_mediator.php")
-    fun updateMediator(@Body request: UpdateMediator): Call<ApiResponse<Unit>>
+    @POST("update_agenda_mediator.php")
+    fun updateMediator(@Body request: UpdateAgendaMediator): Call<ApiResponse<Unit>>
+
+    @POST("update_agenda_admin.php")
+    fun updateAgendaAdmin(@Body request: UpdateAgendaAdmin): Call<ApiResponse<Unit>>
 
     @POST("delete_mediasi.php")
     fun deleteMediasi(@Body body: RequestBody): Call<ResponseBody>
@@ -78,4 +86,7 @@ interface ApiService {
 
     @POST("delete_laporan.php")
     fun deleteLaporan(@Body body: RequestBody): Call<ResponseBody>
+
+    @POST("get_profile.php")
+    fun getProfile(@Body requestBody: Map<String, Int>): Call<ApiResponse<UserProfile>>
 }

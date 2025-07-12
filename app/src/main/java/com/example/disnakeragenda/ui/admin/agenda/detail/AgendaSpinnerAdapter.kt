@@ -1,4 +1,4 @@
-package com.example.disnakeragenda.ui.mediator.agenda.detail
+package com.example.disnakeragenda.ui.admin.agenda.detail
 
 import android.content.Context
 import android.view.View

@@ -6,9 +6,11 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
-    private val ip: String = "192.168.0.106"
+    private val ip: String = "192.168.1.20"
 
     private val BASE_URL = "http://$ip/disnaker-agenda/api/"
+
+    internal val BASE_URL_UPLOADS = "http://$ip/disnaker-agenda/uploads/"
 
     private val client = OkHttpClient.Builder().build()
 

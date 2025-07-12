@@ -1,22 +1,15 @@
 package com.example.disnakeragenda.ui.mediator.laporan.detail
 
 import android.annotation.SuppressLint
-import android.app.DatePickerDialog
-import android.app.TimePickerDialog
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.ArrayAdapter
-import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import com.example.disnakeragenda.R
@@ -25,19 +18,9 @@ import com.example.disnakeragenda.api.RetrofitClient
 import com.example.disnakeragenda.helpers.DateHelper
 import com.example.disnakeragenda.model.AgendaMediasi
 import com.example.disnakeragenda.model.Mediator
-import com.example.disnakeragenda.model.TambahPelapor
-import com.example.disnakeragenda.model.UpdateMediator
-import com.example.disnakeragenda.ui.mediator.agenda.RiwayatAgendaActivity
-import com.example.disnakeragenda.ui.mediator.agenda.detail.DetailAgendaActivity
-import com.example.disnakeragenda.ui.mediator.laporan.RiwayatLaporanActivity
-import com.example.disnakeragenda.ui.mediator.laporan.tambah.TambahLaporanActivity
-import com.example.disnakeragenda.ui.pelapor.RiwayatPelaporActivity
-import com.example.disnakeragenda.ui.pelapor.tambah.TambahPelaporActivity
-import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.util.Calendar
 
 class DetailLaporanActivity : AppCompatActivity() {
 

@@ -74,10 +74,11 @@ class DashboardFragment : Fragment() {
             "admin" -> {
                 binding.layoutPelapor.visibility = View.GONE
                 binding.layoutAdmin.visibility = View.VISIBLE
-                binding.layoutMediator.visibility = View.GONE
+                binding.layoutMediator.visibility = View.VISIBLE
+                binding.cardViewTambahLaporanMediator.visibility = View.GONE
 
                 binding.cardViewRiwayatAgenda.setOnClickListener {
-                    val intent = Intent(requireContext(), RiwayatAgendaActivity::class.java)
+                    val intent = Intent(requireContext(), com.example.disnakeragenda.ui.admin.agenda.RiwayatAgendaActivity::class.java)
                     startActivity(intent)
                 }
 

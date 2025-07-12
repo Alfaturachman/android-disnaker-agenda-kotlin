@@ -79,9 +79,12 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun loginUser(email: String, password: String) {
+        Log.d("LoginActivity", "Memulai loginUser() dengan email: $email")
+
         val requestData = JSONObject()
         requestData.put("email", email)
         requestData.put("password", password)
+        Log.d("LoginActivity", "Request JSON: $requestData")
 
         val body = RequestBody.create("application/json".toMediaTypeOrNull(), requestData.toString())
 
@@ -89,22 +92,28 @@ class LoginActivity : AppCompatActivity() {
 
         call.enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                Log.d("LoginActivity", "onResponse() dipanggil")
                 if (response.isSuccessful) {
                     try {
                         val result = response.body()?.string()
-                        Log.d("LoginActivity", "Response: $result")  // Log the entire response
+                        Log.d("LoginActivity", "Response body: $result")
 
-                        val jsonResponse = JSONObject(result)
+                        val jsonResponse = JSONObject(result ?: "")
+                        Log.d("LoginActivity", "JSON Parsed: $jsonResponse")
 
-                        // Check if the response has the "status" and proceed with parsing
                         if (jsonResponse.getBoolean("status")) {
+                            Log.d("LoginActivity", "Status login: true")
+
                             val userDetails = jsonResponse.getJSONObject("user_details")
+                            Log.d("LoginActivity", "user_details: $userDetails")
+
                             val userDetailId = when {
                                 userDetails.has("id") -> userDetails.getString("id").toInt()
                                 userDetails.has("id_laporan") -> userDetails.getString("id_laporan").toInt()
                                 userDetails.has("id_mediator") -> userDetails.getString("id_mediator").toInt()
                                 else -> 0
                             }
+                            Log.d("LoginActivity", "userDetailId: $userDetailId")
 
                             val userId = jsonResponse.getString("id_user").toInt()
                             val userEmail = jsonResponse.getString("email")
@@ -112,6 +121,13 @@ class LoginActivity : AppCompatActivity() {
                             val userNama = userDetails.getString("nama")
                             val userTelp = userDetails.optString("telp", "")
                             val userAlamat = userDetails.optString("alamat", "")
+
+                            Log.d("LoginActivity", "userId: $userId")
+                            Log.d("LoginActivity", "userEmail: $userEmail")
+                            Log.d("LoginActivity", "userLevel: $userLevel")
+                            Log.d("LoginActivity", "userNama: $userNama")
+                            Log.d("LoginActivity", "userTelp: $userTelp")
+                            Log.d("LoginActivity", "userAlamat: $userAlamat")
 
                             val sharedPreferences = getSharedPreferences("UserSession", MODE_PRIVATE)
                             val editor = sharedPreferences.edit()
@@ -123,26 +139,30 @@ class LoginActivity : AppCompatActivity() {
                             editor.putString("telp", userTelp)
                             editor.putString("alamat", userAlamat)
                             editor.apply()
+                            Log.d("LoginActivity", "Data user disimpan ke SharedPreferences")
 
                             Toast.makeText(this@LoginActivity, "Login Berhasil", Toast.LENGTH_SHORT).show()
-
                             startActivity(Intent(this@LoginActivity, MainActivity::class.java))
                             finish()
                         } else {
-                            Toast.makeText(this@LoginActivity, "Login Gagal: ${jsonResponse.getString("error")}", Toast.LENGTH_SHORT).show()
+                            val errorMsg = jsonResponse.optString("error", "Login gagal")
+                            Log.e("LoginActivity", "Login gagal: $errorMsg")
+                            Toast.makeText(this@LoginActivity, "Login Gagal: $errorMsg", Toast.LENGTH_SHORT).show()
                         }
                     } catch (e: JSONException) {
-                        Log.e("LoginActivity", "JSON Error: ${e.message}")
+                        Log.e("LoginActivity", "JSONException saat parsing: ${e.message}")
                         Toast.makeText(this@LoginActivity, "Error Parsing Response", Toast.LENGTH_SHORT).show()
                     }
                 } else {
-                    Log.e("LoginActivity", "Response Error: ${response.code()} - ${response.message()}")
+                    val errorBody = response.errorBody()?.string()
+                    Log.e("LoginActivity", "Response error ${response.code()}: ${response.message()}")
+                    Log.e("LoginActivity", "Isi errorBody: $errorBody")
                     Toast.makeText(this@LoginActivity, "Login Gagal", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                Log.e("LoginActivity", "Request Error: ${t.message}")
+                Log.e("LoginActivity", "Request gagal: ${t.message}", t)
                 Toast.makeText(this@LoginActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })

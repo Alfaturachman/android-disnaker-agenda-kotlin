@@ -18,6 +18,12 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".ui.admin.agenda.detail.DetailAgendaActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.admin.agenda.RiwayatAgendaActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.profile.DetailProfileActivity"
             android:exported="false" />
         <activity
